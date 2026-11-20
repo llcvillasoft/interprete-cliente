@@ -35,6 +35,9 @@ jobs:
   bateria:
     needs: app
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     steps:
       - uses: actions/checkout@v5
       - uses: actions/download-artifact@v7
@@ -53,10 +56,18 @@ jobs:
           BATERIA_APP_URL: http://127.0.0.1:8080/
           BATERIA_API_PUERTO: "8787"
         run: pytest
+      - name: Cancelar el run si este job falla
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/cancel"
 
   lighthouse:
     needs: app
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     steps:
       - uses: actions/checkout@v5
       - uses: actions/download-artifact@v7
@@ -94,10 +105,18 @@ jobs:
             lighthouse.json
             medidas-lighthouse.json
             medidas-tamanos.json
+      - name: Cancelar el run si este job falla
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/cancel"
 
   android:
     needs: app
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     defaults:
       run:
         working-directory: app
@@ -146,10 +165,18 @@ jobs:
           target: google_apis
           arch: x86_64
           script: cd app && flutter test integration_test -d emulator-5554 --dart-define=API_BASE_URL=http://10.0.2.2:8787 --dart-define=API_DISPOSITIVO=dispositivo-prueba-001 --dart-define=API_SECRETO=secreto-de-prueba
+      - name: Cancelar el run si este job falla
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/cancel"
 
   windows:
     needs: app
     runs-on: windows-latest
+    permissions:
+      contents: read
+      actions: write
     defaults:
       run:
         working-directory: app
@@ -202,10 +229,18 @@ jobs:
           --dart-define=API_BASE_URL=http://127.0.0.1:8787
           --dart-define=API_DISPOSITIVO=dispositivo-prueba-001
           --dart-define=API_SECRETO=secreto-de-prueba
+      - name: Cancelar el run si este job falla
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/cancel"
 
   ios:
     needs: app
     runs-on: macos-latest
+    permissions:
+      contents: read
+      actions: write
     defaults:
       run:
         working-directory: app
@@ -253,3 +288,8 @@ jobs:
           --dart-define=API_BASE_URL=http://127.0.0.1:8787
           --dart-define=API_DISPOSITIVO=dispositivo-prueba-001
           --dart-define=API_SECRETO=secreto-de-prueba
+      - name: Cancelar el run si este job falla
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/cancel"
