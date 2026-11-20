@@ -228,3 +228,7 @@ uint64_t ac_capture_overrun_frames(const ac_engine *engine) {
   if (engine == NULL) return 0;
   return ma_atomic_load_explicit_64(&engine->capture_overrun_frames, ma_atomic_memory_order_relaxed);
 }
+
+/* Stubs en rojo de la marca T0 (se reemplazan en el siguiente commit). */
+ac_status ac_schedule_playback(ac_engine *engine, const float *samples, uint32_t frames, uint64_t *ticket_out) { (void)engine; (void)samples; (void)frames; (void)ticket_out; return AC_ERR_STATE; }
+ac_status ac_playback_end_sample(const ac_engine *engine, uint64_t ticket, uint64_t *sample_out) { (void)engine; (void)ticket; (void)sample_out; return AC_ERR_STATE; }

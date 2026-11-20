@@ -31,6 +31,10 @@ extern "C" {
 
 typedef struct ac_engine ac_engine;
 
+/* Bloques programados pendientes como máximo, y bloques terminados que se
+ * conservan para consultar su T0. */
+#define AC_MAX_SCHEDULED 64
+
 typedef enum {
   AC_OK = 0,
   AC_ERR_ARG = -1,    /* argumento nulo o inválido */
@@ -67,6 +71,21 @@ AC_API uint64_t ac_sample_counter(const ac_engine *engine);
 /* Encola hasta `frames` muestras para reproducir. Devuelve las aceptadas. */
 AC_API uint32_t ac_write_playback(ac_engine *engine, const float *samples, uint32_t frames);
 AC_API uint32_t ac_playback_pending(const ac_engine *engine);
+
+/* Programa la reproducción de `frames` muestras como un bloque completo: o entra
+ * entero en el búfer o no entra (AC_ERR_STATE, sin escribir nada). Devuelve en
+ * `ticket_out` el identificador del bloque. Como máximo hay AC_MAX_SCHEDULED
+ * bloques pendientes de terminar. */
+AC_API ac_status ac_schedule_playback(ac_engine *engine, const float *samples,
+                                      uint32_t frames, uint64_t *ticket_out);
+
+/* T0 de un bloque programado: la muestra del contador en que termina su audio,
+ * es decir, la primera muestra posterior a su último frame reproducido.
+ * AC_ERR_STATE mientras el bloque no se ha reproducido por completo;
+ * AC_ERR_ARG si el ticket no existe o ya no se conserva. Se conservan los
+ * últimos AC_MAX_SCHEDULED bloques terminados. */
+AC_API ac_status ac_playback_end_sample(const ac_engine *engine, uint64_t ticket,
+                                        uint64_t *sample_out);
 
 /* Copia la captura disponible, hasta `max_frames`. Devuelve los frames copiados. */
 AC_API uint32_t ac_read_capture(ac_engine *engine, float *dst, uint32_t max_frames);
