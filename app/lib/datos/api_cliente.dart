@@ -1,0 +1,99 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
+
+import '../dominio/ventana.dart';
+
+/// Error de la API: `error` del ErrorBody del contrato y su código de estado HTTP.
+class ErrorApi implements Exception {
+  ErrorApi(this.estado, this.mensaje);
+
+  final int estado;
+  final String mensaje;
+
+  @override
+  String toString() => 'ErrorApi($estado): $mensaje';
+}
+
+/// Sesión creada: `session.session_id` y `session.status` del contrato.
+class SesionCreada {
+  const SesionCreada({required this.id, required this.estado});
+
+  final String id;
+
+  /// Estado del contrato: created, running, paused, finishing, closed o abandoned.
+  final String estado;
+}
+
+/// Lo que la pantalla Hoy y la sesión necesitan de la API.
+abstract interface class ApiCliente {
+  /// Factores f tras cada turno, en orden: `GET /v1/progress?metric=levels&direction=…`.
+  Future<List<double>> nivelesDe(Direccion direccion);
+
+  /// Crea una sesión de práctica: `POST /v1/sessions`.
+  Future<SesionCreada> crearSesion();
+}
+
+class ClienteHttp implements ApiCliente {
+  ClienteHttp({
+    required this.baseUrl,
+    required this.dispositivo,
+    required this.secreto,
+    http.Client? cliente,
+  }) : _cliente = cliente ?? http.Client();
+
+  final String baseUrl;
+  final String dispositivo;
+  final String secreto;
+  final http.Client _cliente;
+  String? _token;
+
+  Future<String> _tokenVigente() async {
+    final existente = _token;
+    if (existente != null) return existente;
+    final respuesta = await _cliente.post(
+      Uri.parse('$baseUrl/v1/auth/token'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'device_id': dispositivo, 'secret': secreto}),
+    );
+    final token = _leer(respuesta)['token'] as String;
+    _token = token;
+    return token;
+  }
+
+  Map<String, dynamic> _leer(http.Response respuesta) {
+    final cuerpo = jsonDecode(respuesta.body) as Map<String, dynamic>;
+    if (respuesta.statusCode >= 400) {
+      throw ErrorApi(respuesta.statusCode, cuerpo['error'] as String? ?? 'error');
+    }
+    return cuerpo;
+  }
+
+  @override
+  Future<List<double>> nivelesDe(Direccion direccion) async {
+    final token = await _tokenVigente();
+    final uri = Uri.parse('$baseUrl/v1/progress').replace(
+      queryParameters: {'metric': 'levels', 'direction': direccion.clave},
+    );
+    final serie = _leer(await _cliente.get(uri, headers: {'Authorization': 'Bearer $token'}));
+    final puntos = serie['points'] as List<dynamic>;
+    return puntos
+        .map((punto) => ((punto as Map<String, dynamic>)['f_after'] as num).toDouble())
+        .toList();
+  }
+
+  @override
+  Future<SesionCreada> crearSesion() async {
+    final token = await _tokenVigente();
+    final respuesta = await _cliente.post(
+      Uri.parse('$baseUrl/v1/sessions'),
+      headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+      body: jsonEncode({}),
+    );
+    final sesion = _leer(respuesta)['session'] as Map<String, dynamic>;
+    return SesionCreada(
+      id: sesion['session_id'] as String,
+      estado: sesion['status'] as String,
+    );
+  }
+}

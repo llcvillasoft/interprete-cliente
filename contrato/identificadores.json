@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "descripcion": "Identificadores de semántica compartidos por el cliente Flutter y la batería de interfaz. Convención: pantalla.componente.variante. Cada identificador se asigna con Semantics(identifier: ...).",
+  "pantallas": {
+    "hoy": [
+      "hoy.ventana.en-es",
+      "hoy.ventana.es-en",
+      "hoy.navegacion.barra",
+      "hoy.navegacion.riel",
+      "hoy.practicar.boton"
+    ],
+    "sesion": [
+      "sesion.anillo",
+      "sesion.estado"
+    ]
+  }
+}

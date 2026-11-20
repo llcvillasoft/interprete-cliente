@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Doble de la capa semántica de Hoy</title>
+</head>
+<body>
+  <!--
+    Doble de prueba. Imita la estructura que Flutter web expone tras activar
+    la semántica: un marcador para activarla y, después, nodos con el atributo
+    flt-semantics-identifier. La estructura real debe confirmarse con la app de Flutter.
+  -->
+  <flt-semantics-placeholder role="button" tabindex="0" aria-label="Enable accessibility"></flt-semantics-placeholder>
+  <flt-semantics-container id="contenedor"></flt-semantics-container>
+  <script>
+    document.querySelector("flt-semantics-placeholder").addEventListener("click", () => {
+      const contenedor = document.getElementById("contenedor");
+      const nodos = [
+        ["hoy.ventana.en-es", "EN→ES · f 1,40"],
+        ["hoy.ventana.es-en", "ES→EN · f 1,20"],
+        ["hoy.navegacion.barra", "Navegación inferior"],
+        ["hoy.practicar.boton", "Practicar"],
+      ];
+      nodos.forEach(([identificador, texto], indice) => {
+        const nodo = document.createElement("flt-semantics");
+        nodo.id = "flt-semantic-node-" + indice;
+        nodo.setAttribute("flt-semantics-identifier", identificador);
+        nodo.textContent = texto;
+        nodo.addEventListener("click", () => { nodo.textContent = nodo.textContent + " · iniciada"; });
+        contenedor.appendChild(nodo);
+      });
+    });
+  </script>
+</body>
+</html>
