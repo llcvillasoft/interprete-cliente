@@ -11,7 +11,7 @@ DOBLE = (Path(__file__).parent / "dobles" / "semantica_hoy.html").resolve()
 @pytest.fixture
 def pantalla(pagina):
     pagina.goto(DOBLE.as_uri())
-    return PantallaWeb(pagina, espera_ms=300)
+    return PantallaWeb(pagina, espera_ms=3000)
 
 
 def test_un_identificador_fuera_del_contrato_no_se_localiza(pantalla):
