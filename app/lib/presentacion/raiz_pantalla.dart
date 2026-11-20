@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
 import '../datos/api_cliente.dart';
+import '../recursos/textos.dart';
 import '../tokens.dart';
 import 'hoy_pantalla.dart';
 
 const _destinos = <({IconData icono, String etiqueta})>[
-  (icono: Icons.mic_none, etiqueta: 'Practicar'),
-  (icono: Icons.fact_check_outlined, etiqueta: 'Revisar'),
-  (icono: Icons.show_chart, etiqueta: 'Progreso'),
-  (icono: Icons.menu_book_outlined, etiqueta: 'Cuaderno'),
-  (icono: Icons.person_outline, etiqueta: 'Perfil'),
+  (icono: Icons.mic_none, etiqueta: Textos.practicar),
+  (icono: Icons.fact_check_outlined, etiqueta: Textos.revisar),
+  (icono: Icons.show_chart, etiqueta: Textos.progreso),
+  (icono: Icons.menu_book_outlined, etiqueta: Textos.cuaderno),
+  (icono: Icons.person_outline, etiqueta: Textos.perfil),
 ];
 
 /// Estructura con la navegación adaptable al ancho: barra inferior o riel lateral.
@@ -34,14 +35,14 @@ class _RaizPantallaState extends State<RaizPantalla> {
         final ancho = anchoDe(restricciones.maxWidth);
         final contenido = _indice == 0
             ? HoyPantalla(api: widget.api)
-            : const Center(child: Text('Esta vista llega en una fase posterior'));
+            : const Center(child: Text(Textos.vistaPendiente));
 
         if (ancho == AnchoPantalla.compacto) {
           return Scaffold(
             body: contenido,
             bottomNavigationBar: Semantics(
               identifier: 'hoy.navegacion.barra',
-              label: 'Navegación inferior',
+              label: Textos.navegacionInferior,
               container: true,
               child: NavigationBar(
                 selectedIndex: _indice,
@@ -60,7 +61,7 @@ class _RaizPantallaState extends State<RaizPantalla> {
             children: [
               Semantics(
                 identifier: 'hoy.navegacion.riel',
-                label: 'Navegación lateral con etiquetas',
+                label: Textos.navegacionLateral,
                 container: true,
                 child: NavigationRail(
                   selectedIndex: _indice,

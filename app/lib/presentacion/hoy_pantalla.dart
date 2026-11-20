@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../datos/api_cliente.dart';
 import '../dominio/ventana.dart';
+import '../recursos/textos.dart';
 import '../tokens.dart';
 import 'sesion_pantalla.dart';
 
@@ -37,7 +38,7 @@ class _HoyPantallaState extends State<HoyPantalla> {
     } on ErrorApi catch (error) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo crear la sesión (${error.estado})')),
+        SnackBar(content: Text(Textos.noSePudoCrearSesion(error.estado))),
       );
     }
   }
@@ -51,7 +52,7 @@ class _HoyPantallaState extends State<HoyPantalla> {
         return ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text('Hoy', style: Theme.of(context).textTheme.headlineMedium),
+            Text(Textos.hoy, style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 16),
             if (ventanas == null) const LinearProgressIndicator(),
             if (ventanas != null)
@@ -63,7 +64,7 @@ class _HoyPantallaState extends State<HoyPantalla> {
               button: true,
               child: FilledButton(
                 onPressed: _practicar,
-                child: const Text('Practicar'),
+                child: Text(Textos.practicar),
               ),
             ),
           ],
@@ -84,8 +85,12 @@ class _TarjetaVentana extends StatelessWidget {
     final color = direccion == Direccion.enEs ? Tokens.enEs : Tokens.esEn;
     final actual = ventana;
     final texto = actual == null
-        ? '${direccion.etiqueta} · sin turnos todavía'
-        : '${direccion.etiqueta} · f ${formatoFactor(actual.factor)} · ${actual.tendencia.texto}';
+        ? Textos.ventanaSinTurnos(direccion.etiqueta)
+        : Textos.ventanaDetalle(
+            direccion.etiqueta,
+            formatoFactor(actual.factor),
+            actual.tendencia.texto,
+          );
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Semantics(
