@@ -29,6 +29,16 @@ struct ac_engine {
   volatile ma_uint64 samples_processed;
   volatile ma_uint64 playback_underrun_frames;
   volatile ma_uint64 capture_overrun_frames;
+
+  /* T0 de los bloques programados. El productor escribe written_frames,
+   * marker_end y marker_tail; el callback escribe played_frames, marker_done y
+   * marker_sample. Los frames se cuentan desde la apertura. */
+  ma_uint64 written_frames;
+  volatile ma_uint64 played_frames;
+  volatile ma_uint64 marker_tail;
+  volatile ma_uint64 marker_done;
+  ma_uint64 marker_end[AC_MAX_SCHEDULED];
+  ma_uint64 marker_sample[AC_MAX_SCHEDULED];
 };
 
 static void on_audio(ma_device *device, void *output, const void *input, ma_uint32 frames) {
@@ -36,6 +46,9 @@ static void on_audio(ma_device *device, void *output, const void *input, ma_uint
   float *dst = (float *)output;
   const float *src = (const float *)input;
   ma_uint32 done;
+  ma_uint64 played_before = e->played_frames;
+  ma_uint64 sample_before =
+      ma_atomic_load_explicit_64(&e->samples_processed, ma_atomic_memory_order_relaxed);
 
   /* Reproducción: lo que no hay en el búfer sale como silencio. */
   done = 0;
@@ -53,6 +66,22 @@ static void on_audio(ma_device *device, void *output, const void *input, ma_uint
     memset(dst + done, 0, (frames - done) * sizeof(float));
     ma_atomic_fetch_add_explicit_64(&e->playback_underrun_frames, frames - done,
                                     ma_atomic_memory_order_relaxed);
+  }
+
+  /* T0: los frames reales de esta llamada son los primeros de la salida, en
+   * orden. Un bloque termina cuando su último frame (ordinal end - 1) está
+   * dentro de ellos; su T0 es la muestra del ordinal `end`. */
+  e->played_frames = played_before + done;
+  {
+    ma_uint64 head = ma_atomic_load_explicit_64(&e->marker_done, ma_atomic_memory_order_relaxed);
+    ma_uint64 tail = ma_atomic_load_explicit_64(&e->marker_tail, ma_atomic_memory_order_acquire);
+    while (head < tail) {
+      ma_uint64 slot = head % AC_MAX_SCHEDULED;
+      if (e->marker_end[slot] > played_before + done) break;
+      e->marker_sample[slot] = sample_before + (e->marker_end[slot] - played_before);
+      head += 1;
+      ma_atomic_store_explicit_64(&e->marker_done, head, ma_atomic_memory_order_release);
+    }
   }
 
   /* Captura: lo que no cabe se descarta y se cuenta. */
@@ -195,6 +224,7 @@ uint32_t ac_write_playback(ac_engine *engine, const float *samples, uint32_t fra
     ma_pcm_rb_commit_write(&engine->playback_rb, want);
     done += want;
   }
+  engine->written_frames += done;
   return done;
 }
 
@@ -229,6 +259,43 @@ uint64_t ac_capture_overrun_frames(const ac_engine *engine) {
   return ma_atomic_load_explicit_64(&engine->capture_overrun_frames, ma_atomic_memory_order_relaxed);
 }
 
-/* Stubs en rojo de la marca T0 (se reemplazan en el siguiente commit). */
-ac_status ac_schedule_playback(ac_engine *engine, const float *samples, uint32_t frames, uint64_t *ticket_out) { (void)engine; (void)samples; (void)frames; (void)ticket_out; return AC_ERR_STATE; }
-ac_status ac_playback_end_sample(const ac_engine *engine, uint64_t ticket, uint64_t *sample_out) { (void)engine; (void)ticket; (void)sample_out; return AC_ERR_STATE; }
+ac_status ac_schedule_playback(ac_engine *engine, const float *samples, uint32_t frames,
+                               uint64_t *ticket_out) {
+  ma_uint64 ticket;
+  ma_uint64 done;
+  uint32_t accepted;
+
+  if (engine == NULL || samples == NULL || ticket_out == NULL || frames == 0) return AC_ERR_ARG;
+  if (!engine->playback_rb_ready) return AC_ERR_STATE;
+
+  /* Único productor: el índice de cola solo lo escribe esta función. */
+  ticket = ma_atomic_load_explicit_64(&engine->marker_tail, ma_atomic_memory_order_relaxed);
+  done = ma_atomic_load_explicit_64(&engine->marker_done, ma_atomic_memory_order_acquire);
+  if (ticket - done >= AC_MAX_SCHEDULED) return AC_ERR_STATE;
+  if (ma_pcm_rb_available_write(&engine->playback_rb) < frames) return AC_ERR_STATE;
+
+  /* El marcador se publica antes de escribir las muestras: el callback no puede
+   * llegar al fin del bloque sin que su marcador ya exista. */
+  engine->marker_end[ticket % AC_MAX_SCHEDULED] = engine->written_frames + frames;
+  ma_atomic_store_explicit_64(&engine->marker_tail, ticket + 1, ma_atomic_memory_order_release);
+
+  accepted = ac_write_playback(engine, samples, frames);
+  (void)accepted; /* con el espacio comprobado, el bloque entra entero */
+  *ticket_out = ticket;
+  return AC_OK;
+}
+
+ac_status ac_playback_end_sample(const ac_engine *engine, uint64_t ticket, uint64_t *sample_out) {
+  ma_uint64 issued;
+  ma_uint64 done;
+
+  if (engine == NULL || sample_out == NULL) return AC_ERR_ARG;
+  issued = ma_atomic_load_explicit_64(&engine->marker_tail, ma_atomic_memory_order_acquire);
+  if (ticket >= issued) return AC_ERR_ARG;
+  done = ma_atomic_load_explicit_64(&engine->marker_done, ma_atomic_memory_order_acquire);
+  if (ticket >= done) return AC_ERR_STATE;
+  /* La ranura del ticket se reutiliza cuando terminan AC_MAX_SCHEDULED bloques más. */
+  if (done - ticket > AC_MAX_SCHEDULED) return AC_ERR_ARG;
+  *sample_out = engine->marker_sample[ticket % AC_MAX_SCHEDULED];
+  return AC_OK;
+}
