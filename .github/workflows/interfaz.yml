@@ -53,3 +53,40 @@ jobs:
           BATERIA_APP_URL: http://127.0.0.1:8080/
           BATERIA_API_PUERTO: "8787"
         run: pytest
+      - name: Diagnóstico de la semántica de Flutter web
+        if: failure()
+        env:
+          BATERIA_APP_URL: http://127.0.0.1:8080/
+        run: |
+          python - <<'EOF'
+          import os
+          from playwright.sync_api import sync_playwright
+          registros = []
+          with sync_playwright() as p:
+              navegador = p.chromium.launch(executable_path="/usr/bin/google-chrome", headless=True)
+              pagina = navegador.new_page(viewport={"width": 390, "height": 844})
+              pagina.on("console", lambda m: registros.append(f"consola {m.type}: {m.text}"))
+              pagina.on("pageerror", lambda e: registros.append(f"error de página: {e}"))
+              pagina.on("requestfailed", lambda r: registros.append(f"petición fallida {r.url}: {r.failure}"))
+              pagina.on("response", lambda r: registros.append(f"respuesta {r.status} {r.url}") if "8787" in r.url or "8080" in r.url and r.status >= 400 else None)
+              pagina.goto(os.environ["BATERIA_APP_URL"])
+              pagina.wait_for_timeout(10000)
+              print("placeholder:", pagina.locator("flt-semantics-placeholder").count())
+              print("flt-semantics:", pagina.locator("flt-semantics").count())
+              print("con flt-semantics-identifier:", pagina.locator("[flt-semantics-identifier]").count())
+              print("flutter-view:", pagina.locator("flutter-view").count(), " canvas:", pagina.locator("canvas").count())
+              atributos = pagina.evaluate("() => [...new Set([...document.querySelectorAll('flt-semantics')].flatMap(e => e.getAttributeNames()))]")
+              print("atributos de flt-semantics:", atributos)
+              print("texto del cuerpo:", pagina.evaluate("() => document.body.innerText.slice(0, 400)"))
+              pagina.screenshot(path="diagnostico.png", full_page=True)
+              for linea in registros[:60]:
+                  print(linea)
+              navegador.close()
+          EOF
+      - name: Subir el diagnóstico
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostico-semantica
+          path: diagnostico.png
+          if-no-files-found: ignore
