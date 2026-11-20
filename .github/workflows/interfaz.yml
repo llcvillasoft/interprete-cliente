@@ -165,6 +165,9 @@ jobs:
       - run: flutter pub get
       - name: Generar la plataforma Windows
         run: flutter create --platforms=windows --project-name interprete_cliente --org com.llcvillasoft .
+      - name: Quitar la prueba de plantilla que genera flutter create
+        shell: pwsh
+        run: Remove-Item -Path test/widget_test.dart -ErrorAction SilentlyContinue
       - name: Pruebas unitarias y de widgets en Windows
         run: flutter test
       - name: Compilar la aplicación de Windows de prueba
@@ -218,6 +221,8 @@ jobs:
       - run: flutter pub get
       - name: Generar la plataforma iOS
         run: flutter create --platforms=ios --project-name interprete_cliente --org com.llcvillasoft .
+      - name: Quitar la prueba de plantilla que genera flutter create
+        run: rm -f test/widget_test.dart
       - name: Permitir HTTP hacia la API simulada en la prueba
         run: /usr/libexec/PlistBuddy -c "Add :NSAppTransportSecurity dict" -c "Add :NSAppTransportSecurity:NSAllowsArbitraryLoads bool true" ios/Runner/Info.plist
       - name: Pruebas unitarias y de widgets en macOS
