@@ -18,13 +18,13 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 - Los textos visibles de la presentación pasaron a `app/lib/recursos/textos.dart` con el PR #5 (commit b0ec407), precedido de su prueba (commit 207362d).
 - El documento maestro y este tracker llegaron con el PR #6 (commit 02f55b0).
 - CI: la versión web y el APK de Android compilan. Faltan Windows e iOS para cerrar F2-01: la rama `F2-01-plataformas-windows-ios` añade los jobs `windows` (Windows) e `ios` (sin firma) a `interfaz.yml`, con el mismo patrón del job de Android, y queda pendiente de que CI los dé en verde.
-- Siguiente paso de F2: cerrar F2-01 con los jobs de Windows e iOS en verde; después, el núcleo de audio en Windows (F2-02).
+- Siguiente paso de F2: cerrar F2-01 con los jobs de Windows e iOS en verde; en F2-02, seguir con el puente FFI en Dart y el backend WASAPI.
 
 ## 3. Fases del cliente
 
 | Fase | Criterio de salida | Estado | Notas |
 | --- | --- | --- | --- |
-| F2 · Cliente MVP | Sesión adaptativa completa en el cliente, en Windows y en un móvil, con el criterio 1 del POC cumplido en ambos | En curso | Backend de F2 hecho (F2-17 a F2-23, en «Backend — tracker»); en el cliente, F2-01 en curso y F2-02 a F2-16 pendientes |
+| F2 · Cliente MVP | Sesión adaptativa completa en el cliente, en Windows y en un móvil, con el criterio 1 del POC cumplido en ambos | En curso | Backend de F2 hecho (F2-17 a F2-23, en «Backend — tracker»); en el cliente, F2-01 y F2-02 en curso y F2-03 a F2-16 pendientes |
 | F3 · Multieje | Un segundo eje converge en simulación y en uso real sin degradar la pausa | En curso | Cliente pendiente: consola de perillas y mezcla de ruido en el dispositivo |
 | F4 · Progreso | Un paquete de referencia repetido muestra el progreso métrica por métrica | Pendiente en cliente | F4-02 pendiente; vistas de progreso maquetadas |
 | F5 · Tiempo real | El interlocutor vivo cumple su objetivo de latencia en uso real | Pendiente | Reproductor de tiempo real (vista 24) |
@@ -35,7 +35,7 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 | ID | Entregable | Estado | Criterio de salida | Notas |
 | --- | --- | --- | --- | --- |
 | F2-01 | Esqueleto del cliente: navegación, diseño, cliente de API generado | En curso | Compila en web, Windows, iOS y Android | Repositorio con la documentación de vistas y diseño (31068fd); pantalla Hoy, navegación adaptable, cliente de API y ratchets de calidad (PR #3 en 8bd6fe2 y PR #4 en a0c3972, ambas en `main`); textos externalizados (PR #5 en b0ec407). Web, APK, Windows e iOS compilan y pasan en el PR #7 (commit 99e4f61). El PR #7 está mezclado en `main` (e48d094); el job de iOS en `main` sigue en curso y la fila pasa a Hecho cuando termine en verde |
-| F2-02 | Núcleo de audio dúplex con miniaudio, primero en Windows | En curso | Criterio 1 del POC en Windows | Rebanadas 1 y 2 en la rama `F2-02-nucleo-audio-windows`: núcleo en C sobre miniaudio v0.11.26 (7e80a0d) y marca T0 con precisión de muestra en bloques programados (a0e315a); 205 comprobaciones en verde con backend nulo y ThreadSanitizer sin avisos. Falta: puente FFI en Dart, backend WASAPI, integración de CMake en Windows y medición en Windows |
+| F2-02 | Núcleo de audio dúplex con miniaudio, primero en Windows | En curso | Criterio 1 del POC en Windows | Rebanadas 1 y 2 en `main` con el PR #8 (merge 0938298): núcleo en C sobre miniaudio v0.11.26 (7e80a0d) y marca T0 con precisión de muestra en bloques programados (a0e315a); 205 comprobaciones en verde con backend nulo y ThreadSanitizer sin avisos; CI en verde en 5c1d848. Falta: puente FFI en Dart, backend WASAPI, integración de CMake en Windows y medición en Windows |
 | F2-03 | Núcleo de audio en iOS y Android | Pendiente | Criterio 1 del POC en un iPhone y un Android | — |
 | F2-04 | Núcleo de audio web | Pendiente | Precisión documentada y marcada como web | — |
 | F2-05 | Calibración del dispositivo | Pendiente | Veredicto apto o no apto por ruta de audio | Ver regla de calibración en el backend (F2-19) |
@@ -111,6 +111,7 @@ Los conflictos de contenido (Hoy con o sin racha, aprobación de vistas, anchos 
 ## 10. Pendientes
 
 - Cerrar F2-01: que los jobs `windows` e `ios` de CI pasen en verde en la rama `F2-01-plataformas-windows-ios`.
+- Cerrar F2-02: puente FFI en Dart, backend WASAPI, integración de CMake en Windows y medición del criterio 1 en Windows.
 - Maquetar las vistas 29 a 31 (M2-08), la 32 (M5-02) y la 33 (M5-01).
 - Maquetar los retoques pendientes de la lista de la sección 7.
 - Decidir D-01 antes de F2-07, D-07 antes de F4-02 y D-11 antes de publicar.
