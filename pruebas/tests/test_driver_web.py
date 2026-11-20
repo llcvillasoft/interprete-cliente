@@ -44,3 +44,24 @@ def test_pulsar_un_identificador_dispara_su_accion(pantalla):
     pantalla.activar_semantica()
     pantalla.pulsar("hoy.practicar.boton")
     assert "iniciada" in pantalla.texto("hoy.practicar.boton")
+
+
+def test_activar_la_semantica_espera_al_marcador_que_llega_tarde(pagina):
+    pagina.set_content(
+        """
+        <html><body><script>
+          setTimeout(() => {
+            const marcador = document.createElement('flt-semantics-placeholder');
+            marcador.addEventListener('click', () => {
+              const nodo = document.createElement('flt-semantics');
+              nodo.setAttribute('flt-semantics-identifier', 'hoy.practicar.boton');
+              document.body.appendChild(nodo);
+            });
+            document.body.appendChild(marcador);
+          }, 800);
+        </script></body></html>
+        """
+    )
+    pantalla = PantallaWeb(pagina, espera_ms=3000)
+    pantalla.activar_semantica()
+    assert pantalla.elemento("hoy.practicar.boton").count() == 1

@@ -21,9 +21,14 @@ class PantallaWeb:
         self._espera_ms = espera_ms
 
     def activar_semantica(self) -> None:
-        marcador = self._pagina.locator("flt-semantics-placeholder")
-        if marcador.count():
+        # Flutter inserta el marcador de semántica tras cargar el script, así que se espera a que llegue.
+        # Si nunca llega, la semántica ya estaba activa y la comprobación de abajo decide.
+        marcador = self._pagina.locator("flt-semantics-placeholder").first
+        try:
+            marcador.wait_for(state="attached", timeout=self._espera_ms)
             marcador.dispatch_event("click")
+        except ErrorPlaywright:
+            pass
         try:
             self._pagina.locator("[flt-semantics-identifier]").first.wait_for(
                 state="attached", timeout=self._espera_ms
