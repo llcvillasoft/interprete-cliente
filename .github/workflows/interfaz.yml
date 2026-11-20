@@ -84,6 +84,7 @@ jobs:
       - name: Comprobar los ratchets de Lighthouse y de tamaño
         run: |
           python -m calidad.lighthouse lighthouse.json > medidas-lighthouse.json
+          cat medidas-lighthouse.json medidas-tamanos.json
           python -m calidad.evaluar --parcial calidad/linea-base.json medidas-lighthouse.json medidas-tamanos.json
       - name: Puntuaciones en el resumen
         if: always()
