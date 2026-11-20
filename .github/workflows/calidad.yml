@@ -1,0 +1,19 @@
+name: calidad
+
+on:
+  push:
+    branches: [main, calidad/ratchets]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ratchets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+      - run: pip install "pytest>=8"
+      - name: Pruebas del motor de ratchets
+        run: python -m pytest calidad/tests -q
