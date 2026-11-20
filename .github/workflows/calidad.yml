@@ -17,3 +17,9 @@ jobs:
       - run: pip install "pytest>=8"
       - name: Pruebas del motor de ratchets
         run: python -m pytest calidad/tests -q
+      - name: Cadenas literales de la interfaz
+        run: python -m calidad.literales app/lib/presentacion > medidas-literales.json
+      - name: Comprobar el ratchet de cadenas literales
+        run: |
+          cat medidas-literales.json
+          python -m calidad.evaluar --parcial calidad/linea-base.json medidas-literales.json
