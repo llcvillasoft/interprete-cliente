@@ -8,4 +8,6 @@ La línea base solo se aprieta. Cuando una medida mejora, `actualizar` sube el s
 
 Para correr las pruebas de este motor, desde la raíz del repositorio: `python -m pytest calidad/tests`.
 
-Las medidas reales todavía no están conectadas. Las cadenas literales necesitan la carpeta `lib/` del proyecto Flutter, el analizador necesita el proyecto y Lighthouse necesita una compilación web medible de la app. Cada una se añade a `linea-base.json` cuando pueda medirse, con su valor actual como línea base inicial.
+Lighthouse ya se mide en el job `lighthouse` de `.github/workflows/interfaz.yml`, sobre la compilación web de la app. `python -m calidad.lighthouse` convierte el informe en medidas de 0 a 100, y `python -m calidad.evaluar --parcial` las compara con la línea base. Esa comparación todavía no tiene reglas: las reglas de Lighthouse se añaden a `linea-base.json` en un commit aparte, con el valor de la primera medición en CI como punto de partida. Hasta entonces el job solo publica las puntuaciones en el resumen.
+
+Las cadenas literales y el analizador siguen sin conectar. Las cadenas necesitan la carpeta `lib/` del proyecto Flutter y el analizador necesita el proyecto. Cada una se añade a `linea-base.json` cuando pueda medirse, con su valor actual como línea base inicial.

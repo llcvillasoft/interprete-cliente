@@ -53,3 +53,43 @@ jobs:
           BATERIA_APP_URL: http://127.0.0.1:8080/
           BATERIA_API_PUERTO: "8787"
         run: pytest
+
+  lighthouse:
+    needs: app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: app-web
+          path: app/build/web
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.13"
+      - name: Servir la compilación de la app
+        run: nohup python -m http.server 8090 --bind 127.0.0.1 --directory app/build/web > servidor-lighthouse.log 2>&1 &
+      - name: Esperar a que la app responda
+        run: for i in $(seq 1 30); do curl -sf http://127.0.0.1:8090/ > /dev/null && exit 0; sleep 1; done; exit 1
+      - name: Medir con Lighthouse
+        run: >
+          npx --yes lighthouse@12 http://127.0.0.1:8090/
+          --only-categories=performance,accessibility,best-practices,seo
+          --chrome-flags="--headless=new --no-sandbox"
+          --output=json --output-path=lighthouse.json --quiet
+      - name: Comprobar los ratchets de Lighthouse
+        run: |
+          python -m calidad.lighthouse lighthouse.json > medidas-lighthouse.json
+          python -m calidad.evaluar --parcial calidad/linea-base.json medidas-lighthouse.json
+      - name: Puntuaciones en el resumen
+        if: always()
+        run: cat medidas-lighthouse.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: lighthouse
+          path: |
+            lighthouse.json
+            medidas-lighthouse.json
