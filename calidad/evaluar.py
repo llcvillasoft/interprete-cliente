@@ -17,7 +17,7 @@ from calidad import ratchet
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Comprueba medidas contra la línea base.")
     parser.add_argument("base", type=Path)
-    parser.add_argument("medidas", type=Path)
+    parser.add_argument("medidas", type=Path, nargs="+")
     parser.add_argument("--parcial", action="store_true")
     args = parser.parse_args(argv)
 
@@ -27,7 +27,9 @@ def main(argv=None) -> int:
         print(f"Línea base no válida: {error}", file=sys.stderr)
         return 2
 
-    medidas = json.loads(args.medidas.read_text(encoding="utf-8"))
+    medidas = {}
+    for ruta in args.medidas:
+        medidas.update(json.loads(ruta.read_text(encoding="utf-8")))
     if args.parcial:
         base = {**base, "metricas": {n: r for n, r in base["metricas"].items() if n in medidas}}
 

@@ -49,3 +49,27 @@ def test_una_base_mal_formada_sale_con_codigo_2(tmp_path, capsys):
     medidas = escribir(tmp_path, "medidas.json", {"x": 1})
     assert main([base, medidas]) == 2
     assert "Línea base no válida" in capsys.readouterr().err
+
+
+BASE_DOS_FUENTES = {
+    "version": 1,
+    "metricas": {
+        "lighthouse.accesibilidad": {"tipo": "suelo", "valor": 90, "tolerancia": 2},
+        "rendimiento.js_kb": {"tipo": "tope", "valor": 500},
+    },
+}
+
+
+def test_varios_archivos_de_medidas_se_combinan_antes_de_comprobar(tmp_path):
+    base = escribir(tmp_path, "base.json", BASE_DOS_FUENTES)
+    lighthouse = escribir(tmp_path, "lighthouse.json", {"lighthouse.accesibilidad": 91})
+    tamanos = escribir(tmp_path, "tamanos.json", {"rendimiento.js_kb": 480})
+    assert main([base, lighthouse, tamanos, "--parcial"]) == 0
+
+
+def test_una_medida_combinada_que_supera_su_tope_falla(tmp_path, capsys):
+    base = escribir(tmp_path, "base.json", BASE_DOS_FUENTES)
+    lighthouse = escribir(tmp_path, "lighthouse.json", {"lighthouse.accesibilidad": 91})
+    tamanos = escribir(tmp_path, "tamanos.json", {"rendimiento.js_kb": 600})
+    assert main([base, lighthouse, tamanos, "--parcial"]) == 1
+    assert "rendimiento.js_kb" in capsys.readouterr().out

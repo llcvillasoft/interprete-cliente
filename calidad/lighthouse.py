@@ -9,8 +9,10 @@ import math
 import sys
 from pathlib import Path
 
+# El rendimiento de Lighthouse no se mide: exige un Largest Contentful Paint, y
+# Flutter web pinta en un canvas sin elementos que Lighthouse pueda medir. El
+# rendimiento se mide con el tamaño de los JavaScript (calidad/tamanos.py).
 CATEGORIAS = {
-    "performance": "lighthouse.rendimiento",
     "accessibility": "lighthouse.accesibilidad",
     "best-practices": "lighthouse.buenas_practicas",
     "seo": "lighthouse.seo",

@@ -12,28 +12,37 @@ def informe(**puntuaciones):
     return {"categories": categorias}
 
 
-def todas(rendimiento=0.43, accesibilidad=0.91, practicas=0.96, seo=0.82):
+def todas(accesibilidad=0.91, practicas=0.96, seo=0.82, rendimiento=0.43):
     return informe(
-        performance=rendimiento,
         accessibility=accesibilidad,
         **{"best-practices": practicas},
         seo=seo,
+        performance=rendimiento,
     )
 
 
-def test_convierte_cada_categoria_en_una_medida_entera_de_cien():
+def test_convierte_cada_categoria_medida_en_una_medida_entera_de_cien():
     medidas = medidas_desde_informe(todas())
     assert medidas == {
-        "lighthouse.rendimiento": 43,
         "lighthouse.accesibilidad": 91,
         "lighthouse.buenas_practicas": 96,
         "lighthouse.seo": 82,
     }
 
 
+def test_el_rendimiento_de_lighthouse_no_forma_parte_de_las_medidas():
+    assert "lighthouse.rendimiento" not in medidas_desde_informe(todas())
+
+
+def test_un_informe_sin_puntuacion_de_rendimiento_se_acepta():
+    sin_lcp = todas()
+    sin_lcp["categories"]["performance"]["score"] = None
+    assert medidas_desde_informe(sin_lcp)["lighthouse.accesibilidad"] == 91
+
+
 def test_redondea_como_lighthouse_y_no_trunca():
-    medidas = medidas_desde_informe(todas(rendimiento=0.999))
-    assert medidas["lighthouse.rendimiento"] == 100
+    medidas = medidas_desde_informe(todas(accesibilidad=0.999))
+    assert medidas["lighthouse.accesibilidad"] == 100
 
 
 def test_un_informe_sin_categorias_se_rechaza():
@@ -48,10 +57,10 @@ def test_una_categoria_que_falta_se_rechaza_con_su_nombre():
         medidas_desde_informe(incompleto)
 
 
-def test_una_categoria_sin_puntuacion_se_rechaza():
+def test_una_categoria_medida_sin_puntuacion_se_rechaza():
     sin_puntuacion = todas()
-    sin_puntuacion["categories"]["performance"]["score"] = None
-    with pytest.raises(InformeInvalido, match="performance"):
+    sin_puntuacion["categories"]["accessibility"]["score"] = None
+    with pytest.raises(InformeInvalido, match="accessibility"):
         medidas_desde_informe(sin_puntuacion)
 
 
@@ -61,7 +70,7 @@ def test_la_linea_de_ordenes_escribe_las_medidas_en_json(tmp_path, capsys):
     ruta = tmp_path / "lighthouse.json"
     ruta.write_text(json.dumps(todas()), encoding="utf-8")
     assert main([str(ruta)]) == 0
-    assert json.loads(capsys.readouterr().out)["lighthouse.rendimiento"] == 43
+    assert json.loads(capsys.readouterr().out)["lighthouse.accesibilidad"] == 91
 
 
 def test_un_archivo_que_no_es_json_sale_con_codigo_2(tmp_path, capsys):

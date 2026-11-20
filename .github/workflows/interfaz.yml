@@ -76,16 +76,18 @@ jobs:
       - name: Medir con Lighthouse
         run: >
           npx --yes lighthouse@12 http://127.0.0.1:8090/
-          --only-categories=performance,accessibility,best-practices,seo
+          --only-categories=accessibility,best-practices,seo
           --chrome-flags="--headless=new --no-sandbox"
           --output=json --output-path=lighthouse.json --quiet
-      - name: Comprobar los ratchets de Lighthouse
+      - name: Medir el tamaño de los JavaScript de arranque
+        run: python -m calidad.tamanos app/build/web > medidas-tamanos.json
+      - name: Comprobar los ratchets de Lighthouse y de tamaño
         run: |
           python -m calidad.lighthouse lighthouse.json > medidas-lighthouse.json
-          python -m calidad.evaluar --parcial calidad/linea-base.json medidas-lighthouse.json
+          python -m calidad.evaluar --parcial calidad/linea-base.json medidas-lighthouse.json medidas-tamanos.json
       - name: Puntuaciones en el resumen
         if: always()
-        run: cat medidas-lighthouse.json >> "$GITHUB_STEP_SUMMARY"
+        run: cat medidas-lighthouse.json medidas-tamanos.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -93,6 +95,7 @@ jobs:
           path: |
             lighthouse.json
             medidas-lighthouse.json
+            medidas-tamanos.json
 
   android:
     needs: app
