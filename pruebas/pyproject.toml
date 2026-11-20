@@ -17,4 +17,6 @@ addopts = "-ra --strict-markers"
 markers = [
   "web: escenario que se ejecuta en el navegador",
   "android: escenario que se ejecuta en el emulador Android",
+  "ios: escenario que se ejecuta en el simulador de iPhone",
+  "windows: escenario que se ejecuta en Windows (escritorio)",
 ]

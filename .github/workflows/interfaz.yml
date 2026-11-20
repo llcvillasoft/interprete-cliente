@@ -110,6 +110,9 @@ jobs:
       - run: flutter pub get
       - name: Generar la plataforma Android
         run: flutter create --platforms=android --project-name interprete_cliente --org com.llcvillasoft .
+      - name: Permitir HTTP hacia la API simulada en la prueba
+        run: |
+          sed -i 's|<application|<application android:usesCleartextTraffic="true"|' android/app/src/main/AndroidManifest.xml
       - name: Compilar el APK de prueba
         run: >
           flutter build apk --debug
@@ -120,3 +123,133 @@ jobs:
         with:
           name: app-android
           path: app/build/app/outputs/flutter-apk/app-debug.apk
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - name: Instalar dependencias de la API simulada
+        working-directory: pruebas
+        run: python -m pip install "jsonschema>=4.18"
+      - name: Levantar la API simulada
+        working-directory: pruebas
+        run: nohup python -m bateria.lanzar_api --puerto 8787 > servidor-api.log 2>&1 &
+      - name: Esperar a la API simulada
+        run: for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8787/v1/me && exit 0; sleep 1; done; exit 1
+      - name: Activar KVM para el emulador
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Pruebas de integración en el emulador de Android
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          script: cd app && flutter test integration_test -d emulator-5554 --dart-define=API_BASE_URL=http://10.0.2.2:8787 --dart-define=API_DISPOSITIVO=dispositivo-prueba-001 --dart-define=API_SECRETO=secreto-de-prueba
+
+  windows:
+    needs: app
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: flutter pub get
+      - name: Generar la plataforma Windows
+        run: flutter create --platforms=windows --project-name interprete_cliente --org com.llcvillasoft .
+      - name: Quitar la prueba de plantilla que genera flutter create
+        shell: pwsh
+        run: Remove-Item -Path test/widget_test.dart -ErrorAction SilentlyContinue
+      - name: Pruebas unitarias y de widgets en Windows
+        run: flutter test
+      - name: Compilar la aplicación de Windows de prueba
+        run: >
+          flutter build windows --debug
+          --dart-define=API_BASE_URL=http://127.0.0.1:8787
+          --dart-define=API_DISPOSITIVO=dispositivo-prueba-001
+          --dart-define=API_SECRETO=secreto-de-prueba
+      - name: Instalar dependencias de la API simulada
+        working-directory: pruebas
+        run: python -m pip install "jsonschema>=4.18"
+      - name: Levantar la API simulada
+        working-directory: pruebas
+        shell: pwsh
+        run: Start-Process -FilePath python -ArgumentList '-m', 'bateria.lanzar_api', '--puerto', '8787' -WindowStyle Hidden
+      - name: Esperar a la API simulada
+        shell: pwsh
+        run: |
+          for ($i = 0; $i -lt 30; $i++) {
+            try {
+              $cliente = [System.Net.Sockets.TcpClient]::new('127.0.0.1', 8787)
+              $cliente.Close()
+              exit 0
+            } catch {
+              Start-Sleep -Seconds 1
+            }
+          }
+          exit 1
+      - name: Pruebas de integración en Windows
+        run: >
+          flutter test integration_test -d windows
+          --dart-define=API_BASE_URL=http://127.0.0.1:8787
+          --dart-define=API_DISPOSITIVO=dispositivo-prueba-001
+          --dart-define=API_SECRETO=secreto-de-prueba
+
+  ios:
+    needs: app
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v5
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: flutter pub get
+      - name: Generar la plataforma iOS
+        run: flutter create --platforms=ios --project-name interprete_cliente --org com.llcvillasoft .
+      - name: Quitar la prueba de plantilla que genera flutter create
+        run: rm -f test/widget_test.dart
+      - name: Permitir HTTP hacia la API simulada en la prueba
+        run: /usr/libexec/PlistBuddy -c "Add :NSAppTransportSecurity dict" -c "Add :NSAppTransportSecurity:NSAllowsArbitraryLoads bool true" ios/Runner/Info.plist
+      - name: Pruebas unitarias y de widgets en macOS
+        run: flutter test
+      - name: Compilar la aplicación de iOS de prueba sin firma
+        run: >
+          flutter build ios --debug --no-codesign
+          --dart-define=API_BASE_URL=http://127.0.0.1:8787
+          --dart-define=API_DISPOSITIVO=dispositivo-prueba-001
+          --dart-define=API_SECRETO=secreto-de-prueba
+      - name: Instalar dependencias de la API simulada
+        working-directory: pruebas
+        run: python -m pip install "jsonschema>=4.18"
+      - name: Levantar la API simulada
+        working-directory: pruebas
+        run: nohup python -m bateria.lanzar_api --puerto 8787 > servidor-api.log 2>&1 &
+      - name: Esperar a la API simulada
+        run: for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8787/v1/me && exit 0; sleep 1; done; exit 1
+      - name: Arrancar un iPhone simulado
+        run: |
+          UDID=$(xcrun simctl list devices available | grep -m1 "iPhone" | grep -oE "[0-9A-F]{8}(-[0-9A-F]{4}){3}-[0-9A-F]{12}")
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+          echo "SIMULADOR=$UDID" >> "$GITHUB_ENV"
+      - name: Pruebas de integración en el simulador de iPhone
+        run: >
+          flutter test integration_test -d "$SIMULADOR"
+          --dart-define=API_BASE_URL=http://127.0.0.1:8787
+          --dart-define=API_DISPOSITIVO=dispositivo-prueba-001
+          --dart-define=API_SECRETO=secreto-de-prueba

@@ -15,8 +15,10 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 ## 2. Último punto de retoma
 
 - Repositorio `llcvillasoft/interprete-cliente`, creado con la documentación de vistas y diseño (commit 31068fd). La pantalla Hoy, la navegación adaptable, el cliente de API y los ratchets de calidad llegaron con el PR #3 (commit 8bd6fe2) y el PR #4 (commit a0c3972), ambos en `main`.
-- CI: la versión web y el APK de Android compilan. Faltan Windows e iOS para cerrar F2-01.
-- Siguiente paso de F2: cerrar F2-01 compilando en Windows e iOS; después, el núcleo de audio en Windows (F2-02).
+- Los textos visibles de la presentación pasaron a `app/lib/recursos/textos.dart` con el PR #5 (commit b0ec407), precedido de su prueba (commit 207362d).
+- El documento maestro y este tracker llegaron con el PR #6 (commit 02f55b0).
+- CI: la versión web y el APK de Android compilan. Faltan Windows e iOS para cerrar F2-01: la rama `F2-01-plataformas-windows-ios` añade los jobs `windows` (Windows) e `ios` (sin firma) a `interfaz.yml`, con el mismo patrón del job de Android, y queda pendiente de que CI los dé en verde.
+- Siguiente paso de F2: cerrar F2-01 con los jobs de Windows e iOS en verde; después, el núcleo de audio en Windows (F2-02).
 
 ## 3. Fases del cliente
 
@@ -32,7 +34,7 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 
 | ID | Entregable | Estado | Criterio de salida | Notas |
 | --- | --- | --- | --- | --- |
-| F2-01 | Esqueleto del cliente: navegación, diseño, cliente de API generado | En curso | Compila en web, Windows, iOS y Android | Repositorio con la documentación de vistas y diseño (31068fd); pantalla Hoy, navegación adaptable, cliente de API y ratchets de calidad (PR #3 en 8bd6fe2 y PR #4 en a0c3972, ambas en `main`). Web y APK compilan en CI; faltan Windows e iOS |
+| F2-01 | Esqueleto del cliente: navegación, diseño, cliente de API generado | En curso | Compila en web, Windows, iOS y Android | Repositorio con la documentación de vistas y diseño (31068fd); pantalla Hoy, navegación adaptable, cliente de API y ratchets de calidad (PR #3 en 8bd6fe2 y PR #4 en a0c3972, ambas en `main`); textos externalizados (PR #5 en b0ec407). Web y APK compilan en CI; Windows e iOS en la rama `F2-01-plataformas-windows-ios`, pendientes de verde en CI |
 | F2-02 | Núcleo de audio dúplex con miniaudio, primero en Windows | Pendiente | Criterio 1 del POC en Windows | — |
 | F2-03 | Núcleo de audio en iOS y Android | Pendiente | Criterio 1 del POC en un iPhone y un Android | — |
 | F2-04 | Núcleo de audio web | Pendiente | Precisión documentada y marcada como web | — |
@@ -108,7 +110,7 @@ Los conflictos de contenido (Hoy con o sin racha, aprobación de vistas, anchos 
 
 ## 10. Pendientes
 
-- Cerrar F2-01 compilando en Windows e iOS.
+- Cerrar F2-01: que los jobs `windows` e `ios` de CI pasen en verde en la rama `F2-01-plataformas-windows-ios`.
 - Aprobar las maquetas pendientes: vistas 26 a 28, retoque de Hoy, tres estados de espera y las siete vistas de ancho amplio; y el ancho medio, en las vistas del simulacro.
 - Maquetar las vistas 29 a 31 (M2-08), la 32 (M5-02) y la 33 (M5-01).
 - Maquetar los retoques pendientes de la lista de la sección 7.
