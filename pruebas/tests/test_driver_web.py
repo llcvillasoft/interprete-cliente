@@ -65,3 +65,16 @@ def test_activar_la_semantica_espera_al_marcador_que_llega_tarde(pagina):
     pantalla = PantallaWeb(pagina, espera_ms=3000)
     pantalla.activar_semantica()
     assert pantalla.elemento("hoy.practicar.boton").count() == 1
+
+
+def test_texto_usa_la_etiqueta_accesible_cuando_el_nodo_no_tiene_texto(pagina):
+    pagina.set_content(
+        """
+        <html><body>
+          <flt-semantics flt-semantics-identifier="hoy.navegacion.barra"
+                         aria-label="Navegación inferior"></flt-semantics>
+        </body></html>
+        """
+    )
+    pantalla = PantallaWeb(pagina, espera_ms=1000)
+    assert pantalla.texto("hoy.navegacion.barra") == "Navegación inferior"

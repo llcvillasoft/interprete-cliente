@@ -41,6 +41,7 @@ class _RaizPantallaState extends State<RaizPantalla> {
             body: contenido,
             bottomNavigationBar: Semantics(
               identifier: 'hoy.navegacion.barra',
+              label: 'Navegación inferior',
               container: true,
               child: NavigationBar(
                 selectedIndex: _indice,
@@ -59,6 +60,7 @@ class _RaizPantallaState extends State<RaizPantalla> {
             children: [
               Semantics(
                 identifier: 'hoy.navegacion.riel',
+                label: 'Navegación lateral con etiquetas',
                 container: true,
                 child: NavigationRail(
                   selectedIndex: _indice,

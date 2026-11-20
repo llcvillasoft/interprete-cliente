@@ -51,7 +51,9 @@ class PantallaWeb:
                 f"no apareció el identificador {identificador} "
                 f"tras {self._espera_ms} ms"
             ) from error
-        return elemento.first.text_content() or ""
+        nodo = elemento.first
+        # Un nodo contenedor de Flutter no tiene texto propio: su etiqueta va en aria-label.
+        return nodo.text_content() or nodo.get_attribute("aria-label") or ""
 
     def pulsar(self, identificador: str) -> None:
         elemento = self.elemento(identificador)
