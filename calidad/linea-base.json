@@ -2,7 +2,7 @@
   "version": 1,
   "descripcion": "Línea base de los ratchets. Los topes bajan y los suelos suben; nunca se aflojan. Las métricas de Lighthouse y de tamaño se fijaron con la primera medición en CI (run 44674219780 de GitHub Actions): accesibilidad 100, buenas prácticas 79, SEO 90, 2209 KB de JavaScript de arranque.",
   "metricas": {
-    "cadenas_literales_en_ui": {"tipo": "tope", "valor": 19},
+    "cadenas_literales_en_ui": {"tipo": "tope", "valor": 0},
     "avisos_dart_analyze": {"tipo": "tope", "valor": 0},
     "importaciones_entre_capas_prohibidas": {"tipo": "tope", "valor": 0},
     "lighthouse.accesibilidad": {"tipo": "suelo", "valor": 100, "tolerancia": 2},
