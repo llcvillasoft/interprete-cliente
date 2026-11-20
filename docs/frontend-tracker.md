@@ -79,10 +79,10 @@ El catálogo de 25 vistas (1 a 25) está en el documento vivo del frontend, revi
 | --- | --- | --- | --- |
 | Catálogo original, teléfono | 1 a 25 | Maquetadas y aprobadas el 13 de noviembre | — |
 | Retoques a vistas existentes | 1, 2, 8, 15 y 16, 20, 23 y 25 | Pendientes de maquetar | Hoy y el selector (M2-08); biblioteca (M2-08); progreso y debilidades (M2-06); ajustes (M2-08); estados del sistema (M2-08); reproductor de cabina (M4-01) |
-| Vistas del simulacro | 26 a 28 y retoque de Hoy con el índice | Maquetadas el 14 de noviembre en tres anchos, con láminas Main, M y W; pendientes de aprobación | F4-12, F4-13 y F4-14 (backend) |
-| Estados de espera (preparando, reproduciendo, grabando, procesando) | Tres estados del reproductor | Maquetados el 14 de noviembre; pendientes de aprobación | F2 |
-| Anchos amplios (siete vistas) | Hoy, sala de revisión, consola, progreso, historial, expediente y laboratorio | Maquetadas el 14 de noviembre; pendientes de aprobación | F2 a F4 |
-| Ancho medio (tableta) | Solo las vistas del simulacro (26 a 28) | Maquetado el 14 de noviembre, pendiente de aprobación; las 25 vistas anteriores no lo tienen | Diseñar el resto del ancho medio |
+| Vistas del simulacro | 26 a 28 y retoque de Hoy con el índice | Maquetadas el 14 de noviembre en tres anchos, con láminas Main, M y W; aprobadas el 20 de noviembre | F4-12, F4-13 y F4-14 (backend) |
+| Estados de espera (preparando, reproduciendo, grabando, procesando) | Tres estados del reproductor | Maquetados el 14 de noviembre; aprobados el 20 de noviembre | F2 |
+| Anchos amplios (siete vistas) | Hoy, sala de revisión, consola, progreso, historial, expediente y laboratorio | Maquetadas el 14 de noviembre; aprobadas el 20 de noviembre | F2 a F4 |
+| Ancho medio (tableta) | Solo las vistas del simulacro (26 a 28) | Maquetado el 14 de noviembre y aprobado el 20 de noviembre; las 25 vistas anteriores no lo tienen | Diseñar el resto del ancho medio |
 | Catálogo de módulos y detalle | 29 y 30 | Sin maquetar | M2-08 |
 | Reproductor de traducción a la vista | 31 | Sin maquetar | M2-08 |
 | Constancia y horas | 32 | Sin maquetar | M5-02 |
@@ -111,7 +111,6 @@ Los conflictos de contenido (Hoy con o sin racha, aprobación de vistas, anchos 
 ## 10. Pendientes
 
 - Cerrar F2-01: que los jobs `windows` e `ios` de CI pasen en verde en la rama `F2-01-plataformas-windows-ios`.
-- Aprobar las maquetas pendientes: vistas 26 a 28, retoque de Hoy, tres estados de espera y las siete vistas de ancho amplio; y el ancho medio, en las vistas del simulacro.
 - Maquetar las vistas 29 a 31 (M2-08), la 32 (M5-02) y la 33 (M5-01).
 - Maquetar los retoques pendientes de la lista de la sección 7.
 - Decidir D-01 antes de F2-07, D-07 antes de F4-02 y D-11 antes de publicar.

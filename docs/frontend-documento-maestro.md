@@ -150,9 +150,9 @@ La navegación propuesta tiene cuatro destinos (Practicar, Revisar, Progreso y C
 
 | Formato | Ancho de maqueta | Navegación propuesta | Estado de maquetas |
 | --- | --- | --- | --- |
-| Teléfono | 390 px | Barra inferior | Vistas 1 a 25 maquetadas y aprobadas el 13 de noviembre; vistas 26 a 28 con lámina de teléfono (M), pendientes de aprobación |
+| Teléfono | 390 px | Barra inferior | Vistas 1 a 25 maquetadas y aprobadas el 13 de noviembre; vistas 26 a 28 con lámina de teléfono (M), aprobadas el 20 de noviembre |
 | Medio | 834 px | Riel lateral angosto (por confirmar) | Sin láminas confirmadas; la lámina principal de las vistas 26 a 28 podría ser de este ancho (por confirmar) |
-| Amplio | 1440 px | Riel lateral con etiquetas | Siete vistas de la sección 11 y las vistas 26 a 28 (lámina W), pendientes de aprobación |
+| Amplio | 1440 px | Riel lateral con etiquetas | Siete vistas de la sección 11 y las vistas 26 a 28 (lámina W), aprobadas el 20 de noviembre |
 
 Los puntos de corte entre formatos no están confirmados (sección 14).
 
@@ -189,9 +189,9 @@ Son 33 vistas. Las 1 a 25 son del catálogo original; las 26 a 28 son del módul
 | 23 | Estados del sistema | Sobre cualquier pantalla | Sin conexión; envío del expediente; tope del día; actualización obligatoria; dispositivos | F2 | Nueva. Retoque pendiente |
 | 24 | Reproductor · tiempo real | Practicar | Las dos partes del diálogo; anillo en estado de escucha | F5 | Variante del reproductor |
 | 25 | Reproductor · cabina | Practicar | Ondas del orador y del usuario; desfase con su zona cómoda | F6 | Variante del reproductor |
-| 26 | Resultado del simulacro | Revisar | Nota por dirección contra el umbral; unidades de información; datos duros y errores críticos aparte; ítems a revisar; validez del intento | F4-12 | Maquetada con láminas Main, M y W; pendiente de aprobación |
-| 27 | Índice de preparación | Progreso | Estado; rango por dirección frente al umbral; intentos que lo sostienen; cobertura y calibración externa | F4-13 | Maquetada con láminas Main, M y W; pendiente de aprobación |
-| 28 | Calificación externa | Perfil (administrador) | Cola a ciegas; turno con original y rendición; estado por unidad; juicio global; acuerdo con el juez | F4-14 | Maquetada con láminas Main, M y W; pendiente de aprobación |
+| 26 | Resultado del simulacro | Revisar | Nota por dirección contra el umbral; unidades de información; datos duros y errores críticos aparte; ítems a revisar; validez del intento | F4-12 | Maquetada con láminas Main, M y W; aprobada el 20 de noviembre |
+| 27 | Índice de preparación | Progreso | Estado; rango por dirección frente al umbral; intentos que lo sostienen; cobertura y calibración externa | F4-13 | Maquetada con láminas Main, M y W; aprobada el 20 de noviembre |
+| 28 | Calificación externa | Perfil (administrador) | Cola a ciegas; turno con original y rendición; estado por unidad; juicio global; acuerdo con el juez | F4-14 | Maquetada con láminas Main, M y W; aprobada el 20 de noviembre |
 | 29 | Catálogo de módulos | Practicar | Módulos con su acceso (gratuito, activo, bloqueado o vencido), cobertura declarada y estado de calibración | M2-08 | Sin maquetar |
 | 30 | Detalle del módulo y acceso | Practicar | Qué incluye, capacidades, formato, cobertura, aviso de no afiliación, vencimiento del pase y cómo obtenerlo | M2-08 | Sin maquetar |
 | 31 | Reproductor · traducción a la vista | Practicar | El documento, el anillo del tiempo sin cifras y el nivel del micrófono | M2-08 | Sin maquetar |
@@ -278,7 +278,7 @@ Reportes:
 
 ## 9. Estados de espera
 
-Las cuatro esperas de una sesión se diseñan como una sola familia de animaciones sobre el anillo del reproductor. Preparando, Reproduciendo y Procesando tienen lámina propia; Grabando es el reproductor de sesión. Requisito registrado el 13 de noviembre; maquetado el 14 de noviembre; pendiente de aprobación.
+Las cuatro esperas de una sesión se diseñan como una sola familia de animaciones sobre el anillo del reproductor. Preparando, Reproduciendo y Procesando tienen lámina propia; Grabando es el reproductor de sesión. Requisito registrado el 13 de noviembre; maquetado el 14 de noviembre; aprobado el 20 de noviembre.
 
 | Estado | Cuándo ocurre | Indicador |
 | --- | --- | --- |
@@ -354,7 +354,6 @@ Esta secuencia es propuesta; las fuentes no la fijan. El frontend avanza en para
 
 ## 13. Pendientes de diseño
 
-- Aprobar los tres estados de espera, las siete vistas de ancho amplio y las vistas 26 a 28.
 - Confirmar el ancho medio (834 px) y diseñarlo para las vistas que no lo tienen.
 - Maquetar: calentamiento; informe de paquete; informe de calibración; subpantallas del laboratorio (golden set y simulación contrafactual); vistas 29 a 33; retoques de la sección 10.1.
 - Tema claro: el módulo `app_shell` lo prevé y las maquetas solo cubren el oscuro.
@@ -365,7 +364,7 @@ Esta secuencia es propuesta; las fuentes no la fijan. El frontend avanza en para
 ## 14. Conflictos entre fuentes
 
 - Hoy: la tabla de pantallas del documento de arquitectura incluye racha y última sesión; el documento del frontend y la guía del cliente dicen que no. Manda el frontend.
-- Aprobación de las vistas: la guía del cliente y el documento del frontend dicen que las 25 vistas originales están aprobadas el 13 de noviembre. Las siete de ancho amplio, los tres estados de espera y las vistas 26 a 28 siguen pendientes.
+- Aprobación de las vistas: la guía del cliente y el documento del frontend dicen que las 25 vistas originales están aprobadas el 13 de noviembre. Las siete de ancho amplio, los tres estados de espera y las vistas 26 a 28 se aprobaron el 20 de noviembre.
 - Copia del proyecto: «Frontend — vistas y diseño» (14 de noviembre) no trae la sección «Vistas de la arquitectura modular». Esta versión sí la trae, tomada del documento vivo.
 - Anexo A: la copia «Anexo A — Vistas del cliente» se eliminó del proyecto en una sesión anterior, sin haberse cotejado línea a línea con este documento. Su pestaña sigue viva en el documento de arquitectura (cuerpo 5babcbef-203e). Si falta algo, se consulta la pestaña.
 - ASR: el POC usa faster-whisper; el documento de arquitectura propone whisper.cpp para el cliente. Decide D-01.
