@@ -1,0 +1,9 @@
+{
+  "modulos": [
+    {
+      "id": "base",
+      "titulo": "Entrenador básico",
+      "access": {"state": "free", "expires_at": null}
+    }
+  ]
+}
