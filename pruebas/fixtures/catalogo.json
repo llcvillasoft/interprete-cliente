@@ -1,9 +1,22 @@
 {
-  "modulos": [
+  "products": [
     {
       "id": "base",
-      "titulo": "Entrenador básico",
-      "access": {"state": "free", "expires_at": null}
+      "version": 1,
+      "title": "Entrenador básico",
+      "summary": "Práctica libre en inglés-español con la ventana sostenida.",
+      "kind": "base",
+      "affiliation_notice": null,
+      "language_pairs": [
+        "en-es"
+      ],
+      "capabilities": [
+        "consecutive"
+      ],
+      "access": {
+        "state": "free",
+        "expires_at": null
+      }
     }
   ]
 }

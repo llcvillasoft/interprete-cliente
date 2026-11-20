@@ -1,0 +1,25 @@
+{
+  "metric": "levels",
+  "user": "usuario-prueba-base",
+  "period": "day",
+  "direction": "en_es",
+  "versions": [
+    "rubrica-v1 · prompt-v1 · modelo-prueba-v1"
+  ],
+  "points": [
+    {
+      "turn_id": "turno-000",
+      "day": "2026-11-18",
+      "direction": "en_es",
+      "f_after": 1.2,
+      "knobs": {}
+    },
+    {
+      "turn_id": "turno-001",
+      "day": "2026-11-19",
+      "direction": "en_es",
+      "f_after": 1.4,
+      "knobs": {}
+    }
+  ]
+}

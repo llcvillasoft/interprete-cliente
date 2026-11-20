@@ -1,27 +1,33 @@
 """Fixtures de la API simulada.
 
 Cada respuesta del servidor de prueba sale de un archivo JSON en pruebas/fixtures.
-Antes de servir un fixture se comprueba su forma, para que un dato mal escrito
-falle aquí y no dentro de una pantalla.
+Antes de servir un fixture se valida contra el esquema que le corresponde en
+contrato/openapi.json, copia del contrato del backend. Así un dato mal escrito
+falla aquí y no dentro de una pantalla.
 """
 
 import json
+from functools import lru_cache
 from pathlib import Path
 
+from jsonschema import Draft202012Validator, ValidationError
+
 RUTA_FIXTURES = Path(__file__).resolve().parents[1] / "fixtures"
+RUTA_CONTRATO = Path(__file__).resolve().parents[2] / "contrato" / "openapi.json"
 
-ESTADOS_ACCESO = {"free", "active", "locked", "expired"}
-
-REQUISITOS = {
-    "catalogo": ["modulos"],
-    "me": ["id", "language_pairs", "entitlements"],
-    "hoy": ["ventanas"],
-    "sesion": ["id", "product", "max_turns", "state"],
+ESQUEMAS = {
+    "token": "TokenResponse",
+    "catalogo": "CatalogList",
+    "me": "Me",
+    "me_entitlements": "EntitlementList",
+    "sesion": "SessionCreated",
+    "progreso_levels_en_es": "ProgressSeries",
+    "progreso_levels_es_en": "ProgressSeries",
 }
 
 
 class FixtureInvalido(ValueError):
-    """Un fixture no respeta la forma que la app espera."""
+    """Un fixture no respeta el esquema del contrato que le corresponde."""
 
 
 def cargar(nombre: str, carpeta: Path = RUTA_FIXTURES) -> dict:
@@ -35,14 +41,19 @@ def nombres_disponibles(carpeta: Path = RUTA_FIXTURES) -> list[str]:
     return sorted(ruta.stem for ruta in Path(carpeta).glob("*.json"))
 
 
+@lru_cache(maxsize=1)
+def _esquemas() -> dict:
+    contrato = json.loads(RUTA_CONTRATO.read_text(encoding="utf-8"))
+    esquemas = contrato["components"]["schemas"]
+    # El contrato apunta a components/schemas; jsonschema busca las referencias en $defs.
+    return json.loads(json.dumps(esquemas).replace("#/components/schemas/", "#/$defs/"))
+
+
 def _validar(nombre: str, datos: dict) -> None:
-    for clave in REQUISITOS.get(nombre, []):
-        if clave not in datos:
-            raise FixtureInvalido(f"{nombre}: falta la clave «{clave}»")
-    if nombre == "catalogo":
-        for modulo in datos["modulos"]:
-            estado = modulo.get("access", {}).get("state")
-            if estado not in ESTADOS_ACCESO:
-                raise FixtureInvalido(
-                    f"catalogo: estado de acceso no previsto: {estado}"
-                )
+    if nombre not in ESQUEMAS:
+        raise FixtureInvalido(f"{nombre}: sin esquema en el contrato")
+    raiz = {"$defs": _esquemas(), "$ref": f"#/$defs/{ESQUEMAS[nombre]}"}
+    try:
+        Draft202012Validator(raiz).validate(datos)
+    except ValidationError as error:
+        raise FixtureInvalido(f"{nombre}: {error.message}") from error

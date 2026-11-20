@@ -1,6 +1,28 @@
 {
-  "id": "sesion-prueba-001",
-  "product": "base",
-  "max_turns": 12,
-  "state": "created"
+  "session": {
+    "session_id": "sesion-prueba-001",
+    "turns_scheduled": 0,
+    "turns_decided": 0,
+    "finished": false,
+    "events": 1,
+    "knobs": [],
+    "status": "created",
+    "paused": false,
+    "mode": "continuous"
+  },
+  "event": {
+    "event_id": "0b6f1c3e-5a2d-4c8e-9f10-2d3a4b5c6d7e",
+    "type": "SessionCreated",
+    "stream": "session/sesion-prueba-001",
+    "origin": "servidor",
+    "origin_seq": 1,
+    "hlc": {
+      "wall_ms": 1763510400000,
+      "counter": 0
+    },
+    "occurred_at": "2026-11-19T00:00:00Z",
+    "manifest": "25208d5a1dad54eccc68918724e2e3a97835f8c6184b44186310ba1bc4cf36b2",
+    "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "hash": "44daaf0f22f357b52cc8f57e738fd17d4a9cb13707f6d762a30241a3f843f35f"
+  }
 }

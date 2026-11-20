@@ -1,6 +1,0 @@
-{
-  "ventanas": [
-    {"direccion": "en-es", "factor_f": 1.4, "tendencia": "al-alza", "distancia_al_tiempo_real_s": 0.8},
-    {"direccion": "es-en", "factor_f": 1.2, "tendencia": "estable", "distancia_al_tiempo_real_s": 1.1}
-  ]
-}

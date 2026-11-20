@@ -1,5 +1,7 @@
 {
-  "id": "usuario-prueba-base",
-  "language_pairs": ["en-es"],
-  "entitlements": []
+  "user": "usuario-prueba-base",
+  "device_id": "dispositivo-prueba-001",
+  "language_pairs": [
+    "en-es"
+  ]
 }
