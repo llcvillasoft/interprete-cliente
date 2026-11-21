@@ -290,7 +290,7 @@ jobs:
           echo "SIMULADOR=$UDID" >> "$GITHUB_ENV"
       - name: Pruebas de integración en el simulador de iPhone
         run: >
-          flutter test integration_test -d "$SIMULADOR"
+          flutter test integration_test -v -d "$SIMULADOR"
           --dart-define=API_BASE_URL=http://127.0.0.1:8787
           --dart-define=API_DISPOSITIVO=dispositivo-prueba-001
           --dart-define=API_SECRETO=secreto-de-prueba
