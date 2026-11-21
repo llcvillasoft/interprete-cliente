@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
+import '../dominio/bandeja_salida.dart';
 import '../dominio/ventana.dart';
 
 /// Error de la API: `error` del ErrorBody del contrato y su código de estado HTTP.
@@ -34,7 +36,7 @@ abstract interface class ApiCliente {
   Future<SesionCreada> crearSesion();
 }
 
-class ClienteHttp implements ApiCliente {
+class ClienteHttp implements ApiCliente, TransporteEventos {
   ClienteHttp({
     required this.baseUrl,
     required this.dispositivo,
@@ -95,5 +97,55 @@ class ClienteHttp implements ApiCliente {
       id: sesion['session_id'] as String,
       estado: sesion['status'] as String,
     );
+  }
+
+  /// Envía un lote a `POST /v1/events:batch`. Los fallos de red, el 401 y los 5xx son
+  /// transitorios; el resto de 4xx son rechazos definitivos del lote.
+  @override
+  Future<ResultadoLote> enviarEventos(List<Evento> eventos) async {
+    final respuesta = await _postEventos(eventos);
+    if (respuesta.statusCode == 401) {
+      _token = null;
+      throw const ErrorTransitorio('token vencido');
+    }
+    if (respuesta.statusCode >= 500) {
+      throw ErrorTransitorio('servidor ${respuesta.statusCode}');
+    }
+    if (respuesta.statusCode >= 400) {
+      throw EventosRechazados(respuesta.statusCode, _motivo(respuesta));
+    }
+    final cuerpo = _leer(respuesta);
+    return ResultadoLote(
+      recibidos: cuerpo['received'] as int,
+      nuevos: cuerpo['stored'] as int,
+      duplicados: cuerpo['duplicates'] as int,
+    );
+  }
+
+  Future<http.Response> _postEventos(List<Evento> eventos) async {
+    try {
+      final token = await _tokenVigente();
+      return await _cliente.post(
+        Uri.parse('$baseUrl/v1/events:batch'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        body: jsonEncode({'events': eventos}),
+      );
+    } on http.ClientException catch (error) {
+      throw ErrorTransitorio(error.message);
+    } on TimeoutException catch (error) {
+      throw ErrorTransitorio(error.message ?? 'tiempo agotado');
+    }
+  }
+
+  String _motivo(http.Response respuesta) {
+    try {
+      final cuerpo = jsonDecode(respuesta.body);
+      if (cuerpo is Map<String, dynamic> && cuerpo['error'] is String) {
+        return cuerpo['error'] as String;
+      }
+    } on FormatException {
+      // El cuerpo no es JSON: basta con el código de estado.
+    }
+    return 'error ${respuesta.statusCode}';
   }
 }
