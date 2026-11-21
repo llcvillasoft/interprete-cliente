@@ -168,10 +168,9 @@ jobs:
           target: google_apis
           arch: x86_64
           script: |
-            cd app
             adb -s emulator-5554 wait-for-device
-            adb -s emulator-5554 install --no-streaming -r build/app/outputs/flutter-apk/app-debug.apk
-            flutter test integration_test -d emulator-5554 --dart-define=API_BASE_URL=http://10.0.2.2:8787 --dart-define=API_DISPOSITIVO=dispositivo-prueba-001 --dart-define=API_SECRETO=secreto-de-prueba
+            adb -s emulator-5554 install --no-streaming -r app/build/app/outputs/flutter-apk/app-debug.apk
+            cd app && flutter test integration_test -d emulator-5554 --dart-define=API_BASE_URL=http://10.0.2.2:8787 --dart-define=API_DISPOSITIVO=dispositivo-prueba-001 --dart-define=API_SECRETO=secreto-de-prueba
       - name: Cancelar el run si este job falla
         if: failure()
         env:
