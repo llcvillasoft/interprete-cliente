@@ -170,6 +170,19 @@ void main() {
       expect(informe.eventos, 3);
     });
 
+    test('anexos pedidos a la vez al mismo flujo quedan encadenados sin huecos', () async {
+      final e = expediente();
+
+      await Future.wait([
+        for (var n = 0; n < 5; n++)
+          e.anexar(flujo: 'sesion-1', tipo: 'SessionStarted', manifiesto: manifiesto),
+      ]);
+
+      final informe = verificarCadena(await almacen.leer('sesion-1'), flujo: 'sesion-1');
+      expect(informe.ok, isTrue, reason: '${informe.problemas}');
+      expect(informe.eventos, 5);
+    });
+
     test('el contenido personal se guarda sellado y se lee con el expediente', () async {
       final e = expediente();
       await e.anexar(
