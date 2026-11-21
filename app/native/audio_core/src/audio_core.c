@@ -108,7 +108,9 @@ static void on_audio(ma_device *device, void *output, const void *input, ma_uint
 
 ac_status ac_open(const ac_config *config, ac_engine **out) {
   ac_engine *e;
-  ma_backend null_backend = ma_backend_null;
+  ma_backend backend = ma_backend_null;
+  const ma_backend *backends = NULL;
+  uint32_t backend_count = 0;
   ma_device_config dc;
   uint32_t rate;
   uint32_t playback_frames;
@@ -120,8 +122,21 @@ ac_status ac_open(const ac_config *config, ac_engine **out) {
   e = (ac_engine *)calloc(1, sizeof *e);
   if (e == NULL) return AC_ERR_INIT;
 
-  if (ma_context_init(config->use_null_backend ? &null_backend : NULL,
-                      config->use_null_backend ? 1u : 0u, NULL, &e->context) != MA_SUCCESS) {
+  /* Backend fijo: en Windows, WASAPI, sin respaldo a DirectSound ni WinMM, para
+   * que la medición del criterio 1 siempre use la misma API. El resto de
+   * plataformas deja la elección a miniaudio. */
+  if (config->use_null_backend) {
+    backends = &backend;
+    backend_count = 1;
+  } else {
+#if defined(_WIN32)
+    backend = ma_backend_wasapi;
+    backends = &backend;
+    backend_count = 1;
+#endif
+  }
+
+  if (ma_context_init(backends, backend_count, NULL, &e->context) != MA_SUCCESS) {
     free(e);
     return AC_ERR_INIT;
   }
