@@ -300,8 +300,8 @@ jobs:
           # Flutter espera la URL del servicio de Dart leyendo el log del simulador.
           # En algunas ejecuciones esa línea no llega y Flutter espera sin límite.
           # Se detecta ese punto exacto (espera sin avance del log) y se reinicia
-          # el simulador para repetir la prueba una sola vez.
-          for intento in 1 2; do
+          # el simulador para repetir la prueba, hasta tres intentos en total.
+          for intento in 1 2 3; do
             log="prueba-ios-$intento.log"
             flutter test integration_test -v -d "$SIMULADOR" $DEFINES > "$log" 2>&1 &
             pid=$!
@@ -329,15 +329,17 @@ jobs:
             fi
             sleep 2
             kill "$seguidor" 2>/dev/null || true
-            echo "::warning::La espera del servicio de Dart no avanzó en el intento $intento. Se reinicia el simulador y se repite la prueba."
+            echo "::warning::La espera del servicio de Dart no avanzó en el intento $intento."
             kill "$pid" 2>/dev/null || true
             pkill -f "flutter test integration_test" 2>/dev/null || true
             pkill -f "simctl spawn" 2>/dev/null || true
-            xcrun simctl shutdown "$SIMULADOR" || true
-            xcrun simctl boot "$SIMULADOR"
-            xcrun simctl bootstatus "$SIMULADOR" -b
+            if [ "$intento" -lt 3 ]; then
+              xcrun simctl shutdown "$SIMULADOR" || true
+              xcrun simctl boot "$SIMULADOR"
+              xcrun simctl bootstatus "$SIMULADOR" -b
+            fi
           done
-          echo "::error::La espera del servicio de Dart no avanzó en los dos intentos."
+          echo "::error::La espera del servicio de Dart no avanzó en los tres intentos."
           exit 1
       - name: Cancelar el run si este job falla
         if: failure()
