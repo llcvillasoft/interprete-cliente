@@ -262,7 +262,7 @@ static void test_end_sample_rejects_unknown_ticket(void) {
 }
 
 static void test_null_arguments_are_safe(void) {
-  float buf[4];
+  float buf[4] = {0};
   uint64_t ticket = 0;
   CHECK(ac_schedule_playback(NULL, buf, 4, &ticket) == AC_ERR_ARG);
   CHECK(ac_playback_end_sample(NULL, 0, &ticket) == AC_ERR_ARG);
