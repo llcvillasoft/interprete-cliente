@@ -1,0 +1,14 @@
+// GENERADO a partir del código del backend (llcvillasoft/interprete, src/interp/events). No editar a mano.
+// Si cambia la forma canónica o la cadena en el backend, se regenera con los mismos pasos.
+
+/// Cadena de tres eventos emitida por el `Emitter` del backend, con sus huellas.
+const String vectorCadena = r'''[{"actor": "system", "causation_id": null, "correlation_id": null, "event_id": "018bcfe5-6801-7052-89a7-834df2a74de4", "hash": "35031a4d98defdaf99d3ffc2021602e89cb1aedccecdef02c769c7589055827c", "hlc": {"counter": 0, "wall_ms": 1700000000000}, "manifest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "occurred_at": "2023-11-14T22:13:20.000Z", "origin": "dispositivo", "origin_seq": 1, "payload": {"ms": 0.0, "n": 0}, "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000", "schema_version": 1, "scope": "transportable", "stream": "sesion-cadena", "turn_id": null, "type": "SessionStarted"}, {"actor": "system", "causation_id": null, "correlation_id": null, "event_id": "018bcfe5-6803-7065-8317-1ff4a6a3a450", "hash": "15aa6352c3d511b8b275477293927b52cc43aea63b5ee3532937fecb7d01d3c7", "hlc": {"counter": 0, "wall_ms": 1700000000002}, "manifest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "occurred_at": "2023-11-14T22:13:20.002Z", "origin": "dispositivo", "origin_seq": 2, "payload": {"ms": 12.5, "n": 1}, "prev_hash": "35031a4d98defdaf99d3ffc2021602e89cb1aedccecdef02c769c7589055827c", "schema_version": 1, "scope": "transportable", "stream": "sesion-cadena", "turn_id": null, "type": "SessionStarted"}, {"actor": "system", "causation_id": null, "correlation_id": null, "event_id": "018bcfe5-6805-7012-a24b-e40ad23f0824", "hash": "752358c7892a26fba059726ce66a9e743881a9ea1ffa04210015400f91bbbe23", "hlc": {"counter": 0, "wall_ms": 1700000000004}, "manifest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "occurred_at": "2023-11-14T22:13:20.004Z", "origin": "dispositivo", "origin_seq": 3, "payload": {"ms": 25.0, "n": 2}, "prev_hash": "15aa6352c3d511b8b275477293927b52cc43aea63b5ee3532937fecb7d01d3c7", "schema_version": 1, "scope": "transportable", "stream": "sesion-cadena", "turn_id": null, "type": "SessionStarted"}]''';
+
+/// Forma canónica del objeto de `canonicoObjetoDificil` (números, escapes y orden de claves).
+const String vectorCanonicoObjeto = "{\"a\":{\"b\":[null,0.1,100,1e+21,0,4.5,0.000001],\"\u00f1\":false},\"ctl\":\"a\\\"b\\\\c\\u0001\\u001f\u007f/\\n\\t\\r\\b\\f\",\"z\":1.5e-7,\"\ud83d\ude00\":2,\"\ufb01\":1}";
+
+/// Huella (SHA-256 del canónico) de `vectorCanonicoObjeto`.
+const String vectorHuellaCanonicoObjeto = "bba03f89d9e7cf4ea442d68f55805f2c18def97b21076369178eb78187abd1e9";
+
+/// Huella del cuerpo de evento de `expediente_canonico_test.dart` (sin el campo `hash`).
+const String vectorHuellaCuerpo = "3f192644ee39c09136665f1f9c3860dad3c8cd6dbaeac539f69a5367df732ca9";
