@@ -20,13 +20,14 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 - CI: en `main`, el run 44924181340 da en verde todos los jobs de `interfaz`: web, Android, Windows e iOS. Con eso F2-01 cumple su criterio de salida. La prueba de integración de iOS se atasca a veces esperando el servicio de Dart; hay un reintento único del paso que reinicia el simulador, y la causa de fondo sigue abierta.
 - F2-09 (commit 12c574d): mecanismo de la bandeja de salida, en verde en CI.
 - F2-02 (commits f7b419e, ea73b9d y 7584496): puente FFI en Dart en `app/lib/datos/nucleo_audio*.dart`, con las pruebas nuevas en verde en el job `app`. La biblioteca nativa se compila en CI antes de las pruebas de Flutter. En la rama `F2-02-wasapi-windows`, el backend WASAPI queda fijado en Windows y la compilación cruzada con MinGW 13 queda verificada: la DLL no da avisos y exporta las 13 funciones de `audio_core.h`.
+- F2-08 (commit 8422114, con la implementación en ae1dd7b): expediente local en `app/lib/dominio/expediente/`, con la forma canónica y la cadena de huellas iguales a las del backend (`interp.events`). Pruebas con vectores generados por el backend y verde en el job `app`. Pendiente de revisión y fusión.
 - Siguiente paso de F2: en F2-02, llevar a `main` el backend WASAPI, integrar CMake en la app Flutter de Windows y medir el criterio 1 en un equipo Windows; en F2-09, los eventos del expediente (F2-08) y la pantalla de estado de envío.
 
 ## 3. Fases del cliente
 
 | Fase | Criterio de salida | Estado | Notas |
 | --- | --- | --- | --- |
-| F2 · Cliente MVP | Sesión adaptativa completa en el cliente, en Windows y en un móvil, con el criterio 1 del POC cumplido en ambos | En curso | Backend de F2 hecho (F2-17 a F2-23, en «Backend — tracker»); en el cliente, F2-01 hecho; F2-02 y F2-09 en curso; el resto pendiente |
+| F2 · Cliente MVP | Sesión adaptativa completa en el cliente, en Windows y en un móvil, con el criterio 1 del POC cumplido en ambos | En curso | Backend de F2 hecho (F2-17 a F2-23, en «Backend — tracker»); en el cliente, F2-01 hecho y F2-08 hecho (pendiente de fusión); F2-02 y F2-09 en curso; el resto pendiente |
 | F3 · Multieje | Un segundo eje converge en simulación y en uso real sin degradar la pausa | En curso | Cliente pendiente: consola de perillas y mezcla de ruido en el dispositivo |
 | F4 · Progreso | Un paquete de referencia repetido muestra el progreso métrica por métrica | Pendiente en cliente | F4-02 pendiente; vistas de progreso maquetadas |
 | F5 · Tiempo real | El interlocutor vivo cumple su objetivo de latencia en uso real | Pendiente | Reproductor de tiempo real (vista 24) |
@@ -43,7 +44,7 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 | F2-05 | Calibración del dispositivo | Pendiente | Veredicto apto o no apto por ruta de audio | Ver regla de calibración en el backend (F2-19) |
 | F2-06 | VAD local y prueba de equivalencia con el POC | Pendiente | Tramos dentro de la tolerancia sobre el audio dorado | Silero en ONNX Runtime, como en el POC |
 | F2-07 | ASR local según D-01 | Pendiente | Sensibilidad del juez dentro del umbral | Decisión D-01 abierta |
-| F2-08 | Expediente local cifrado con cadena de huellas | Pendiente | Verificación local en verde | — |
+| F2-08 | Expediente local cifrado con cadena de huellas | Hecho | Verificación local en verde | Canónico RFC 8785 y huella SHA-256 con vectores del backend, cadena verificada como `interp.events.chain`, expediente con contenido personal sellado en AES-256-GCM; 96 pruebas en verde en el job `app` (commit 8422114, con la implementación en ae1dd7b). Fuera de su criterio: el adaptador del almacén seguro por plataforma y la persistencia en Drift, que están en «Pendientes». Pendiente de revisión y fusión |
 | F2-09 | Bandeja de salida y sincronización | En curso | Una sesión sin conexión se sincroniza completa | Mecanismo listo (commit 12c574d) en `app/lib/dominio/bandeja_salida.dart`: orden, lotes de hasta 1000, reintentos con espera exponencial, rechazos definitivos aparte y sincronización única en curso. `ClienteHttp.enviarEventos` llama a `POST /v1/events:batch`. Probado con transporte simulado y con `MockClient`. Falta: generar los eventos del expediente (F2-08) y la pantalla de estado de envío |
 | F2-10 | Calibración del usuario (ρ) | Pendiente | ρ y límites de f por dirección | El backend ya fija ρ y límites con UserCalibrated (F2-19) |
 | F2-11 | Entrenamiento: reproductor y tarjeta del turno | Pendiente | Sesión de revisión por turno completa | Vistas 5 y 6 aprobadas en maqueta |
@@ -114,7 +115,8 @@ Los conflictos de contenido (Hoy con o sin racha, aprobación de vistas, anchos 
 
 - F2-01 está hecho desde el run 44924181340 sobre `main`; no quedan pendientes.
 - Cerrar F2-02: llevar a `main` el backend WASAPI (fijado en el código, sin probar en Windows), integrar CMake en la app Flutter de Windows (la carpeta `windows/` la genera `flutter create` en CI y no está en el repo) y medir el criterio 1 en Windows, que necesita un equipo Windows.
-- F2-09: generar los eventos del expediente (depende de F2-08) y la pantalla de estado de envío.
+- F2-08: adaptador del almacén seguro del sistema (Keychain, Keystore, credenciales de Windows, libsecret y WebCrypto) y persistencia del expediente en Drift. Hoy la clave llega por el puerto `AlmacenClaves` y el expediente se guarda en memoria. El adaptador añade un plugin que cambia el bundle web medido por el ratchet de tamaño, así que va en un entregable aparte, medido en CI.
+- F2-09: generar los eventos del expediente con F2-08 (en su rama, pendiente de fusión) y la pantalla de estado de envío.
 - Maquetar las vistas 29 a 31 (M2-08), la 32 (M5-02) y la 33 (M5-01).
 - Maquetar los retoques pendientes de la lista de la sección 7.
 - Decidir D-01 antes de F2-07, D-07 antes de F4-02 y D-11 antes de publicar.
