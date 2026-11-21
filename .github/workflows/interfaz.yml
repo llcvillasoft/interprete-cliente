@@ -22,6 +22,12 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      - name: Compilar la biblioteca nativa de audio y sus pruebas en C
+        run: |
+          cmake -S native/audio_core -B native/audio_core/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build native/audio_core/build --parallel
+          ctest --test-dir native/audio_core/build --output-on-failure
+          echo "AUDIO_CORE_LIB=$PWD/native/audio_core/build/libaudio_core.so" >> "$GITHUB_ENV"
       - run: flutter analyze --no-fatal-infos
       - run: flutter test
       - name: Compilar la web de prueba
