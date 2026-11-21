@@ -1,6 +1,6 @@
 # Frontend · tracker
 
-Estado al 20 de noviembre de 2026. Tracker del producto para el cliente Flutter. Es la fuente del estado de F2 (cliente), de la parte de cliente de F3 y F4, y de las vistas del cliente en M2-08 y M5. Su arquitectura, sus vistas y su diseño están en «Frontend — documento maestro». El estado del backend está en «Backend — tracker».
+Estado al 21 de noviembre de 2026. Tracker del producto para el cliente Flutter. Es la fuente del estado de F2 (cliente), de la parte de cliente de F3 y F4, y de las vistas del cliente en M2-08 y M5. Su arquitectura, sus vistas y su diseño están en «Frontend — documento maestro». El estado del backend está en «Backend — tracker».
 
 Fuentes: tracker de la pestaña principal del documento de arquitectura (revisión 173; filas F2-01 a F2-16 en la línea 2484 del texto, y F3, F4 y M); documento vivo del frontend (revisión 17: catálogo de vistas, retoques y ancho medio); Anexo D (AD-15 y AD-12); guía rápida del cliente (16 de noviembre).
 
@@ -17,14 +17,16 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 - Repositorio `llcvillasoft/interprete-cliente`, creado con la documentación de vistas y diseño (commit 31068fd). La pantalla Hoy, la navegación adaptable, el cliente de API y los ratchets de calidad llegaron con el PR #3 (commit 8bd6fe2) y el PR #4 (commit a0c3972), ambos en `main`.
 - Los textos visibles de la presentación pasaron a `app/lib/recursos/textos.dart` con el PR #5 (commit b0ec407), precedido de su prueba (commit 207362d).
 - El documento maestro y este tracker llegaron con el PR #6 (commit 02f55b0).
-- CI: la versión web y el APK de Android compilan. Faltan Windows e iOS para cerrar F2-01: la rama `F2-01-plataformas-windows-ios` añade los jobs `windows` (Windows) e `ios` (sin firma) a `interfaz.yml`, con el mismo patrón del job de Android, y queda pendiente de que CI los dé en verde.
-- Siguiente paso de F2: cerrar F2-01 con los jobs de Windows e iOS en verde; en F2-02, seguir con el puente FFI en Dart y el backend WASAPI.
+- CI: en `main`, el run 44924181340 (PR #15) da en verde todos los jobs de `interfaz`: web, Android, Windows e iOS. Con eso F2-01 cumple su criterio de salida.
+- F2-09 (PR #14, commit 12c574d): mecanismo de la bandeja de salida, en verde en CI.
+- F2-02 (PR #16, commits f7b419e, ea73b9d y 7584496, pendiente de fusión): puente FFI en Dart en `app/lib/datos/nucleo_audio*.dart`, con las pruebas nuevas en verde en el job `app`. La biblioteca nativa se compila en CI antes de las pruebas de Flutter.
+- Siguiente paso de F2: en F2-02, el backend WASAPI y la integración de CMake en Windows, con la medición en un equipo Windows; en F2-09, los eventos del expediente (F2-08) y la pantalla de estado de envío.
 
 ## 3. Fases del cliente
 
 | Fase | Criterio de salida | Estado | Notas |
 | --- | --- | --- | --- |
-| F2 · Cliente MVP | Sesión adaptativa completa en el cliente, en Windows y en un móvil, con el criterio 1 del POC cumplido en ambos | En curso | Backend de F2 hecho (F2-17 a F2-23, en «Backend — tracker»); en el cliente, F2-01 y F2-02 en curso y F2-03 a F2-16 pendientes |
+| F2 · Cliente MVP | Sesión adaptativa completa en el cliente, en Windows y en un móvil, con el criterio 1 del POC cumplido en ambos | En curso | Backend de F2 hecho (F2-17 a F2-23, en «Backend — tracker»); en el cliente, F2-01 hecho; F2-02 y F2-09 en curso; el resto pendiente |
 | F3 · Multieje | Un segundo eje converge en simulación y en uso real sin degradar la pausa | En curso | Cliente pendiente: consola de perillas y mezcla de ruido en el dispositivo |
 | F4 · Progreso | Un paquete de referencia repetido muestra el progreso métrica por métrica | Pendiente en cliente | F4-02 pendiente; vistas de progreso maquetadas |
 | F5 · Tiempo real | El interlocutor vivo cumple su objetivo de latencia en uso real | Pendiente | Reproductor de tiempo real (vista 24) |
@@ -34,15 +36,15 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 
 | ID | Entregable | Estado | Criterio de salida | Notas |
 | --- | --- | --- | --- | --- |
-| F2-01 | Esqueleto del cliente: navegación, diseño, cliente de API generado | En curso | Compila en web, Windows, iOS y Android | Repositorio con la documentación de vistas y diseño (31068fd); pantalla Hoy, navegación adaptable, cliente de API y ratchets de calidad (PR #3 en 8bd6fe2 y PR #4 en a0c3972, ambas en `main`); textos externalizados (PR #5 en b0ec407). Web, APK, Windows e iOS compilan y pasan en el PR #7 (commit 99e4f61). El PR #7 está mezclado en `main` (e48d094); el job de iOS en `main` sigue en curso y la fila pasa a Hecho cuando termine en verde. La prueba de integración de iOS se queda a veces esperando el servicio de Dart en el log del simulador (ejecución 44876984358, PR #14); la mitigación es un reintento único del paso que reinicia el simulador (PR #15). La causa de fondo sigue abierta |
-| F2-02 | Núcleo de audio dúplex con miniaudio, primero en Windows | En curso | Criterio 1 del POC en Windows | Rebanadas 1 y 2 en `main` con el PR #8 (merge 0938298): núcleo en C sobre miniaudio v0.11.26 (7e80a0d) y marca T0 con precisión de muestra en bloques programados (a0e315a); 205 comprobaciones en verde con backend nulo y ThreadSanitizer sin avisos; CI en verde en 5c1d848. Falta: puente FFI en Dart, backend WASAPI, integración de CMake en Windows y medición en Windows |
+| F2-01 | Esqueleto del cliente: navegación, diseño, cliente de API generado | Hecho | Compila en web, Windows, iOS y Android | Repositorio con la documentación de vistas y diseño (31068fd); pantalla Hoy, navegación adaptable, cliente de API y ratchets de calidad (PR #3 en 8bd6fe2 y PR #4 en a0c3972); textos externalizados (PR #5 en b0ec407); jobs de Windows, iOS y Android en el PR #7 (merge e48d094). Todos los jobs de `interfaz` están en verde en `main` (run 44924181340, PR #15). La prueba de integración de iOS se atasca a veces esperando el servicio de Dart; el PR #15 añade un reintento único del paso que reinicia el simulador, y la causa de fondo sigue abierta |
+| F2-02 | Núcleo de audio dúplex con miniaudio, primero en Windows | En curso | Criterio 1 del POC en Windows | Rebanadas 1 y 2 en `main` con el PR #8 (merge 0938298): núcleo en C sobre miniaudio v0.11.26 (7e80a0d) y marca T0 con precisión de muestra en bloques programados (a0e315a); 205 comprobaciones en verde con backend nulo y ThreadSanitizer sin avisos; CI en verde en 5c1d848. Puente FFI en Dart en el PR #16 (ea73b9d; CI en 7584496), pendiente de fusión: 14 pruebas nuevas en verde en el job `app`, con la biblioteca compilada en CI. Falta: backend WASAPI, integración de CMake en Windows y medición en Windows |
 | F2-03 | Núcleo de audio en iOS y Android | Pendiente | Criterio 1 del POC en un iPhone y un Android | — |
 | F2-04 | Núcleo de audio web | Pendiente | Precisión documentada y marcada como web | — |
 | F2-05 | Calibración del dispositivo | Pendiente | Veredicto apto o no apto por ruta de audio | Ver regla de calibración en el backend (F2-19) |
 | F2-06 | VAD local y prueba de equivalencia con el POC | Pendiente | Tramos dentro de la tolerancia sobre el audio dorado | Silero en ONNX Runtime, como en el POC |
 | F2-07 | ASR local según D-01 | Pendiente | Sensibilidad del juez dentro del umbral | Decisión D-01 abierta |
 | F2-08 | Expediente local cifrado con cadena de huellas | Pendiente | Verificación local en verde | — |
-| F2-09 | Bandeja de salida y sincronización | En curso | Una sesión sin conexión se sincroniza completa | Mecanismo listo en `app/lib/dominio/bandeja_salida.dart`: orden, lotes de hasta 1000, reintentos con espera exponencial, rechazos definitivos aparte y sincronización única en curso. `ClienteHttp.enviarEventos` llama a `POST /v1/events:batch`. Probado con transporte simulado y con `MockClient`. Falta: generar los eventos del expediente (F2-08) y la pantalla de estado de envío |
+| F2-09 | Bandeja de salida y sincronización | En curso | Una sesión sin conexión se sincroniza completa | Mecanismo listo (PR #14, commit 12c574d) en `app/lib/dominio/bandeja_salida.dart`: orden, lotes de hasta 1000, reintentos con espera exponencial, rechazos definitivos aparte y sincronización única en curso. `ClienteHttp.enviarEventos` llama a `POST /v1/events:batch`. Probado con transporte simulado y con `MockClient`. Falta: generar los eventos del expediente (F2-08) y la pantalla de estado de envío |
 | F2-10 | Calibración del usuario (ρ) | Pendiente | ρ y límites de f por dirección | El backend ya fija ρ y límites con UserCalibrated (F2-19) |
 | F2-11 | Entrenamiento: reproductor y tarjeta del turno | Pendiente | Sesión de revisión por turno completa | Vistas 5 y 6 aprobadas en maqueta |
 | F2-12 | Sesión continua con informe | Pendiente | Hito D del POC reproducido en el cliente | El informe de sesión ya lo genera el backend (F2-17) |
@@ -110,8 +112,9 @@ Los conflictos de contenido (Hoy con o sin racha, aprobación de vistas, anchos 
 
 ## 10. Pendientes
 
-- Cerrar F2-01: que los jobs `windows` e `ios` de CI pasen en verde en la rama `F2-01-plataformas-windows-ios`.
-- Cerrar F2-02: puente FFI en Dart, backend WASAPI, integración de CMake en Windows y medición del criterio 1 en Windows.
+- F2-01 está hecho desde el run 44924181340 sobre `main`; no quedan pendientes.
+- Cerrar F2-02: fusionar el PR #16 y después backend WASAPI, integración de CMake en Windows y medición del criterio 1 en Windows, que necesita un equipo Windows.
+- F2-09: generar los eventos del expediente (depende de F2-08) y la pantalla de estado de envío.
 - Maquetar las vistas 29 a 31 (M2-08), la 32 (M5-02) y la 33 (M5-01).
 - Maquetar los retoques pendientes de la lista de la sección 7.
 - Decidir D-01 antes de F2-07, D-07 antes de F4-02 y D-11 antes de publicar.
