@@ -35,7 +35,7 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 | ID | Entregable | Estado | Criterio de salida | Notas |
 | --- | --- | --- | --- | --- |
 | F2-01 | Esqueleto del cliente: navegación, diseño, cliente de API generado | En curso | Compila en web, Windows, iOS y Android | Repositorio con la documentación de vistas y diseño (31068fd); pantalla Hoy, navegación adaptable, cliente de API y ratchets de calidad (PR #3 en 8bd6fe2 y PR #4 en a0c3972, ambas en `main`); textos externalizados (PR #5 en b0ec407). Web, APK, Windows e iOS compilan y pasan en el PR #7 (commit 99e4f61). El PR #7 está mezclado en `main` (e48d094); el job de iOS en `main` sigue en curso y la fila pasa a Hecho cuando termine en verde |
-| F2-02 | Núcleo de audio dúplex con miniaudio, primero en Windows | En curso | Criterio 1 del POC en Windows | Rebanadas 1 y 2 en `main` con el PR #8 (merge 0938298): núcleo en C sobre miniaudio v0.11.26 (7e80a0d) y marca T0 con precisión de muestra en bloques programados (a0e315a); 205 comprobaciones en verde con backend nulo y ThreadSanitizer sin avisos; CI en verde en 5c1d848. Falta: puente FFI en Dart, backend WASAPI, integración de CMake en Windows y medición en Windows |
+| F2-02 | Núcleo de audio dúplex con miniaudio, primero en Windows | En curso | Criterio 1 del POC en Windows | Rebanadas 1 y 2 en `main` con el PR #8 (merge 0938298): núcleo en C sobre miniaudio v0.11.26 (7e80a0d) y marca T0 con precisión de muestra en bloques programados (a0e315a); 205 comprobaciones en verde con backend nulo y ThreadSanitizer sin avisos; CI en verde en 5c1d848. Compilación cruzada para Windows con MinGW 13: la DLL compila sin avisos y exporta las 13 funciones de `audio_core.h`; el test del núcleo compila sin avisos (buffer inicializado). La suite no se ejecuta en Windows todavía. Falta: puente FFI en Dart, backend WASAPI, integración de CMake en Windows y medición en Windows |
 | F2-03 | Núcleo de audio en iOS y Android | Pendiente | Criterio 1 del POC en un iPhone y un Android | — |
 | F2-04 | Núcleo de audio web | Pendiente | Precisión documentada y marcada como web | — |
 | F2-05 | Calibración del dispositivo | Pendiente | Veredicto apto o no apto por ruta de audio | Ver regla de calibración en el backend (F2-19) |
@@ -111,7 +111,7 @@ Los conflictos de contenido (Hoy con o sin racha, aprobación de vistas, anchos 
 ## 10. Pendientes
 
 - Cerrar F2-01: que los jobs `windows` e `ios` de CI pasen en verde en la rama `F2-01-plataformas-windows-ios`.
-- Cerrar F2-02: puente FFI en Dart, backend WASAPI, integración de CMake en Windows y medición del criterio 1 en Windows.
+- Cerrar F2-02: puente FFI en Dart, backend WASAPI, integración de CMake en Windows y medición del criterio 1 en Windows. Ejecutar la suite nativa en Windows queda pendiente de un equipo Windows: el Wine del entorno de desarrollo no arranca un prefijo.
 - Maquetar las vistas 29 a 31 (M2-08), la 32 (M5-02) y la 33 (M5-01).
 - Maquetar los retoques pendientes de la lista de la sección 7.
 - Decidir D-01 antes de F2-07, D-07 antes de F4-02 y D-11 antes de publicar.
