@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  crypto: ^3.0.3
+  cryptography: ^2.7.0
   ffi: ^2.1.0
   http: ^1.2.0
 
