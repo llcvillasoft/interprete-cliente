@@ -108,7 +108,7 @@ void main() {
       expect(a['hlc'], {'wall_ms': instante, 'counter': 0});
       expect(b['hlc'], {'wall_ms': instante, 'counter': 1});
       expect(c['hlc'], {'wall_ms': instante + 5000, 'counter': 0});
-      expect(c['occurred_at'], '2025-11-19T01:23:20.000Z');
+      expect(c['occurred_at'], '2025-11-19T00:00:05.000Z');
     });
 
     test('los eventos locales van en el flujo local, con su propia cadena', () async {
