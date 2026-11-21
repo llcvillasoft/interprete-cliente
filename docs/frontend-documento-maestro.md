@@ -1,6 +1,6 @@
 # Frontend · documento maestro de arquitectura y diseño
 
-Estado al 20 de noviembre de 2026. Reemplaza a «Frontend — vistas y diseño» (borrada del proyecto el 20 de noviembre) y a «GUÍA RÁPIDA — cliente» (migrada aquí el 20 de noviembre). Su tracker es «Frontend — tracker».
+Estado al 21 de noviembre de 2026. Reemplaza a «Frontend — vistas y diseño» (borrada del proyecto el 20 de noviembre) y a «GUÍA RÁPIDA — cliente» (migrada aquí el 20 de noviembre). Su tracker es `docs/frontend-tracker.md` de este repositorio.
 
 Fuentes consolidadas: el documento vivo del frontend en Claude Docs (revisión 17, con la sección «Vistas de la arquitectura modular»); el documento de arquitectura y tracker, pestaña principal (revisión 173, con las secciones «Cliente Flutter», «Interfaz de usuario», «Reportes y gráficos» y «Seguridad, privacidad y retención»); el Anexo D (AD-04, AD-05, AD-06, AD-10 y AD-15); el Anexo B; y la guía rápida del cliente (16 de noviembre), cuyas anclas, invariantes, trampas y orden se cotejaron con este documento el 20 de noviembre. Cuando dos fuentes chocan, la sección 14 lo dice.
 
@@ -15,7 +15,7 @@ Fuentes consolidadas: el documento vivo del frontend en Claude Docs (revisión 1
 - Maquetas de pantallas: https://claude.ai/artifact/ScnMR8v3SgGib17MyxQWGz. Maquetas del simulacro y del índice: https://claude.ai/artifact/KFrLFSt7Tt86UfAvkCdkgw.
 - Repositorio del cliente: `llcvillasoft/interprete-cliente` (GitHub, privado). Contiene la documentación de vistas y diseño (commit 31068fd), la pantalla Hoy, la navegación adaptable, el cliente de API y las puertas de calidad.
 - Cómo llegar a un ancla: con las herramientas de Docs, buscar el código (por ejemplo «AD-15») o el título de la sección dentro del cuerpo indicado.
-- Entregables del cliente: F2-01 a F2-16 en la pestaña principal, sección «Tracker» (copia en «Frontend — tracker»); M2-08 en el Anexo D, AD-12.
+- Entregables del cliente: F2-01 a F2-16 en `docs/frontend-tracker.md` de este repositorio; M2-08 en el Anexo D, AD-12.
 
 Las cifras de las maquetas son ilustrativas.
 
