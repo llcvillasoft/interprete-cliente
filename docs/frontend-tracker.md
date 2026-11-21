@@ -8,19 +8,19 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 
 - Estados: Pendiente, En curso, Hecho o Bloqueado (a la espera de algo externo).
 - «Hecho» significa que el criterio de salida de la fila se cumple en las plataformas que nombra, que las pruebas están en verde y que las puertas de calidad pasan en CI.
-- Cada entregable vive en una rama con su identificador (F2-01, M2-08…). El PR va contra `main`; lo revisa y lo mezcla Alejandro.
+- Cada entregable se trabaja en una rama con su identificador (F2-01, M2-08…) y entra en `main` cuando Alejandro lo revisa y lo mezcla.
 - Estados de las maquetas: Sin maquetar, Maquetada, Pendiente de aprobación y Aprobada (con la fecha de aprobación).
 - Al cerrar un entregable se anota su commit y una línea de nota en su fila.
 
 ## 2. Último punto de retoma
 
-- Repositorio `llcvillasoft/interprete-cliente`, creado con la documentación de vistas y diseño (commit 31068fd). La pantalla Hoy, la navegación adaptable, el cliente de API y los ratchets de calidad llegaron con el PR #3 (commit 8bd6fe2) y el PR #4 (commit a0c3972), ambos en `main`.
-- Los textos visibles de la presentación pasaron a `app/lib/recursos/textos.dart` con el PR #5 (commit b0ec407), precedido de su prueba (commit 207362d).
-- El documento maestro y este tracker llegaron con el PR #6 (commit 02f55b0).
-- CI: en `main`, el run 44924181340 (PR #15) da en verde todos los jobs de `interfaz`: web, Android, Windows e iOS. Con eso F2-01 cumple su criterio de salida.
-- F2-09 (PR #14, commit 12c574d): mecanismo de la bandeja de salida, en verde en CI.
-- F2-02 (PR #16, commits f7b419e, ea73b9d y 7584496, fusionado en `main` con 2ab2333): puente FFI en Dart en `app/lib/datos/nucleo_audio*.dart`, con las pruebas nuevas en verde en el job `app`. La biblioteca nativa se compila en CI antes de las pruebas de Flutter.
-- Siguiente paso de F2: en F2-02, el backend WASAPI y la integración de CMake en Windows, con la medición en un equipo Windows; en F2-09, los eventos del expediente (F2-08) y la pantalla de estado de envío.
+- Repositorio `llcvillasoft/interprete-cliente`, creado con la documentación de vistas y diseño (commit 31068fd). En `main` están la pantalla Hoy, la navegación adaptable, el cliente de API generado y los ratchets de calidad (commits 8bd6fe2 y a0c3972).
+- Los textos visibles de la presentación están en `app/lib/recursos/textos.dart` (commit b0ec407), con su prueba previa (commit 207362d).
+- El documento maestro y este tracker están en `main` (commit 02f55b0).
+- CI: en `main`, el run 44924181340 da en verde todos los jobs de `interfaz`: web, Android, Windows e iOS. Con eso F2-01 cumple su criterio de salida. La prueba de integración de iOS se atasca a veces esperando el servicio de Dart; hay un reintento único del paso que reinicia el simulador, y la causa de fondo sigue abierta.
+- F2-09 (commit 12c574d): mecanismo de la bandeja de salida, en verde en CI.
+- F2-02 (commits f7b419e, ea73b9d y 7584496): puente FFI en Dart en `app/lib/datos/nucleo_audio*.dart`, con las pruebas nuevas en verde en el job `app`. La biblioteca nativa se compila en CI antes de las pruebas de Flutter. En la rama `F2-02-wasapi-windows`, el backend WASAPI queda fijado en Windows y la compilación cruzada con MinGW 13 queda verificada: la DLL no da avisos y exporta las 13 funciones de `audio_core.h`.
+- Siguiente paso de F2: en F2-02, llevar a `main` el backend WASAPI, integrar CMake en la app Flutter de Windows y medir el criterio 1 en un equipo Windows; en F2-09, los eventos del expediente (F2-08) y la pantalla de estado de envío.
 
 ## 3. Fases del cliente
 
@@ -36,15 +36,15 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 
 | ID | Entregable | Estado | Criterio de salida | Notas |
 | --- | --- | --- | --- | --- |
-| F2-01 | Esqueleto del cliente: navegación, diseño, cliente de API generado | Hecho | Compila en web, Windows, iOS y Android | Repositorio con la documentación de vistas y diseño (31068fd); pantalla Hoy, navegación adaptable, cliente de API y ratchets de calidad (PR #3 en 8bd6fe2 y PR #4 en a0c3972); textos externalizados (PR #5 en b0ec407); jobs de Windows, iOS y Android en el PR #7 (merge e48d094). Todos los jobs de `interfaz` están en verde en `main` (run 44924181340, PR #15). La prueba de integración de iOS se atasca a veces esperando el servicio de Dart; el PR #15 añade un reintento único del paso que reinicia el simulador, y la causa de fondo sigue abierta |
-| F2-02 | Núcleo de audio dúplex con miniaudio, primero en Windows | En curso | Criterio 1 del POC en Windows | Rebanadas 1 y 2 en `main` con el PR #8 (merge 0938298): núcleo en C sobre miniaudio v0.11.26 (7e80a0d) y marca T0 con precisión de muestra en bloques programados (a0e315a); 205 comprobaciones en verde con backend nulo y ThreadSanitizer sin avisos; CI en verde en 5c1d848. Puente FFI en Dart en el PR #16 (ea73b9d; CI en 7584496), fusionado en `main` (merge 2ab2333): 14 pruebas nuevas en verde en el job `app`, con la biblioteca compilada en CI. Backend WASAPI fijado en Windows en `ac_open` (pendiente de PR); compilación cruzada con MinGW 13 sin avisos, con el test del búfer inicializado. Falta: integración de CMake en la app Windows de Flutter y medición en Windows |
+| F2-01 | Esqueleto del cliente: navegación, diseño, cliente de API generado | Hecho | Compila en web, Windows, iOS y Android | Repositorio con la documentación de vistas y diseño (31068fd); pantalla Hoy, navegación adaptable, cliente de API y ratchets de calidad (8bd6fe2 y a0c3972); textos externalizados (b0ec407); jobs de Windows, iOS y Android en CI. Todos los jobs de `interfaz` están en verde en `main` (run 44924181340). La prueba de integración de iOS se atasca a veces esperando el servicio de Dart; hay un reintento único del paso que reinicia el simulador, y la causa de fondo sigue abierta |
+| F2-02 | Núcleo de audio dúplex con miniaudio, primero en Windows | En curso | Criterio 1 del POC en Windows | Núcleo en C sobre miniaudio v0.11.26 (7e80a0d) y marca T0 con precisión de muestra en bloques programados (a0e315a); 205 comprobaciones en verde con backend nulo y ThreadSanitizer sin avisos; CI en verde. Puente FFI en Dart (ea73b9d; CI en 7584496): 14 pruebas nuevas en verde en el job `app`, con la biblioteca compilada en CI. En la rama `F2-02-wasapi-windows`: backend WASAPI fijado en Windows en `ac_open`; compilación cruzada con MinGW 13 sin avisos, con el test del búfer inicializado; CMake para Windows compila la DLL y el ejecutable de prueba. Falta: llevar el backend WASAPI a `main`, integración de CMake en la app Flutter de Windows (la carpeta `windows/` la genera `flutter create` en CI y no está en el repo) y medición en Windows |
 | F2-03 | Núcleo de audio en iOS y Android | Pendiente | Criterio 1 del POC en un iPhone y un Android | — |
 | F2-04 | Núcleo de audio web | Pendiente | Precisión documentada y marcada como web | — |
 | F2-05 | Calibración del dispositivo | Pendiente | Veredicto apto o no apto por ruta de audio | Ver regla de calibración en el backend (F2-19) |
 | F2-06 | VAD local y prueba de equivalencia con el POC | Pendiente | Tramos dentro de la tolerancia sobre el audio dorado | Silero en ONNX Runtime, como en el POC |
 | F2-07 | ASR local según D-01 | Pendiente | Sensibilidad del juez dentro del umbral | Decisión D-01 abierta |
 | F2-08 | Expediente local cifrado con cadena de huellas | Pendiente | Verificación local en verde | — |
-| F2-09 | Bandeja de salida y sincronización | En curso | Una sesión sin conexión se sincroniza completa | Mecanismo listo (PR #14, commit 12c574d) en `app/lib/dominio/bandeja_salida.dart`: orden, lotes de hasta 1000, reintentos con espera exponencial, rechazos definitivos aparte y sincronización única en curso. `ClienteHttp.enviarEventos` llama a `POST /v1/events:batch`. Probado con transporte simulado y con `MockClient`. Falta: generar los eventos del expediente (F2-08) y la pantalla de estado de envío |
+| F2-09 | Bandeja de salida y sincronización | En curso | Una sesión sin conexión se sincroniza completa | Mecanismo listo (commit 12c574d) en `app/lib/dominio/bandeja_salida.dart`: orden, lotes de hasta 1000, reintentos con espera exponencial, rechazos definitivos aparte y sincronización única en curso. `ClienteHttp.enviarEventos` llama a `POST /v1/events:batch`. Probado con transporte simulado y con `MockClient`. Falta: generar los eventos del expediente (F2-08) y la pantalla de estado de envío |
 | F2-10 | Calibración del usuario (ρ) | Pendiente | ρ y límites de f por dirección | El backend ya fija ρ y límites con UserCalibrated (F2-19) |
 | F2-11 | Entrenamiento: reproductor y tarjeta del turno | Pendiente | Sesión de revisión por turno completa | Vistas 5 y 6 aprobadas en maqueta |
 | F2-12 | Sesión continua con informe | Pendiente | Hito D del POC reproducido en el cliente | El informe de sesión ya lo genera el backend (F2-17) |
@@ -113,7 +113,7 @@ Los conflictos de contenido (Hoy con o sin racha, aprobación de vistas, anchos 
 ## 10. Pendientes
 
 - F2-01 está hecho desde el run 44924181340 sobre `main`; no quedan pendientes.
-- Cerrar F2-02: PR del backend WASAPI (fijado en el código, sin probar en Windows), integración de CMake en la app Windows de Flutter (la carpeta `windows/` la genera `flutter create` en CI y no está en el repo) y medición del criterio 1 en Windows, que necesita un equipo Windows.
+- Cerrar F2-02: llevar a `main` el backend WASAPI (fijado en el código, sin probar en Windows), integrar CMake en la app Flutter de Windows (la carpeta `windows/` la genera `flutter create` en CI y no está en el repo) y medir el criterio 1 en Windows, que necesita un equipo Windows.
 - F2-09: generar los eventos del expediente (depende de F2-08) y la pantalla de estado de envío.
 - Maquetar las vistas 29 a 31 (M2-08), la 32 (M5-02) y la 33 (M5-01).
 - Maquetar los retoques pendientes de la lista de la sección 7.
