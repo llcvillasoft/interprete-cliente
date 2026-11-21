@@ -6,6 +6,7 @@ import 'package:interprete_cliente/datos/cifrado_aes_gcm.dart';
 import 'package:interprete_cliente/datos/expediente_memoria.dart';
 import 'package:interprete_cliente/dominio/bandeja_salida.dart';
 import 'package:interprete_cliente/dominio/expediente/cadena.dart';
+import 'package:interprete_cliente/dominio/expediente/cifrado.dart';
 import 'package:interprete_cliente/dominio/expediente/claves.dart';
 import 'package:interprete_cliente/dominio/expediente/expediente.dart';
 import 'package:interprete_cliente/dominio/expediente/huella.dart';

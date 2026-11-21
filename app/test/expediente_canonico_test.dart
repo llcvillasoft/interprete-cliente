@@ -27,7 +27,7 @@ Map<String, dynamic> cuerpoDeReferencia() => <String, dynamic>{
 void main() {
   group('forma canónica (RFC 8785), igual que en el backend', () {
     test('escribe los números como los escribe JavaScript', () {
-      const casos = <double, String>{
+      final casos = <double, String>{
         0.0: '0',
         1.0: '1',
         4.5: '4.5',
