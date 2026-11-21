@@ -42,7 +42,7 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 | F2-06 | VAD local y prueba de equivalencia con el POC | Pendiente | Tramos dentro de la tolerancia sobre el audio dorado | Silero en ONNX Runtime, como en el POC |
 | F2-07 | ASR local según D-01 | Pendiente | Sensibilidad del juez dentro del umbral | Decisión D-01 abierta |
 | F2-08 | Expediente local cifrado con cadena de huellas | Pendiente | Verificación local en verde | — |
-| F2-09 | Bandeja de salida y sincronización | Pendiente | Una sesión sin conexión se sincroniza completa | Endpoint `POST /v1/events:batch` ya existe en el backend |
+| F2-09 | Bandeja de salida y sincronización | En curso | Una sesión sin conexión se sincroniza completa | Mecanismo listo en `app/lib/dominio/bandeja_salida.dart`: orden, lotes de hasta 1000, reintentos con espera exponencial, rechazos definitivos aparte y sincronización única en curso. `ClienteHttp.enviarEventos` llama a `POST /v1/events:batch`. Probado con transporte simulado y con `MockClient`. Falta: generar los eventos del expediente (F2-08) y la pantalla de estado de envío |
 | F2-10 | Calibración del usuario (ρ) | Pendiente | ρ y límites de f por dirección | El backend ya fija ρ y límites con UserCalibrated (F2-19) |
 | F2-11 | Entrenamiento: reproductor y tarjeta del turno | Pendiente | Sesión de revisión por turno completa | Vistas 5 y 6 aprobadas en maqueta |
 | F2-12 | Sesión continua con informe | Pendiente | Hito D del POC reproducido en el cliente | El informe de sesión ya lo genera el backend (F2-17) |
