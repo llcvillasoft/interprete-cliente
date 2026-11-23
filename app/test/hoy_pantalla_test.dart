@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:interprete_cliente/datos/api_cliente.dart';
+import 'package:interprete_cliente/dominio/bandeja_salida.dart';
 import 'package:interprete_cliente/dominio/ventana.dart';
 import 'package:interprete_cliente/presentacion/raiz_pantalla.dart';
+
+/// Transporte que nunca recibe eventos: la bandeja de esta prueba está siempre vacía.
+class TransporteSinEnvios implements TransporteEventos {
+  @override
+  Future<ResultadoLote> enviarEventos(List<Evento> eventos) async =>
+      const ResultadoLote(recibidos: 0, nuevos: 0, duplicados: 0);
+}
 
 class ApiFalsa implements ApiCliente {
   ApiFalsa(this.niveles);
@@ -26,7 +34,8 @@ Future<void> abrirConAncho(WidgetTester tester, double ancho, ApiCliente api) as
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.resetPhysicalSize);
   addTearDown(tester.view.resetDevicePixelRatio);
-  await tester.pumpWidget(MaterialApp(home: RaizPantalla(api: api)));
+  final bandeja = BandejaSalida(transporte: TransporteSinEnvios());
+  await tester.pumpWidget(MaterialApp(home: RaizPantalla(api: api, bandeja: bandeja)));
   await tester.pumpAndSettle();
 }
 
@@ -71,5 +80,14 @@ void main() {
     expect(find.text('Lista para grabar'), findsOneWidget);
     final anillo = tester.widget<Semantics>(conIdentificador('sesion.anillo'));
     expect(anillo.properties.label ?? '', isNot(matches(RegExp(r'\d'))));
+  });
+
+  testWidgets('desde Hoy se abre el estado del envío', (tester) async {
+    await abrirConAncho(tester, 390, api);
+
+    await tester.tap(conIdentificador('hoy.estado.envio.boton'));
+    await tester.pumpAndSettle();
+
+    expect(conIdentificador('estado.envio.pendientes'), findsOneWidget);
   });
 }
