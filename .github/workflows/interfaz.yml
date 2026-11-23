@@ -44,38 +44,50 @@ jobs:
           for f in sorted(glob.glob(os.path.join(base, "*.js"))):
               print(f"DIAG|archivo|{os.path.basename(f)}|{os.path.getsize(f)}")
           infos = sorted(glob.glob(os.path.join("build", "**", "*.info.json"), recursive=True))
-          print("DIAG|infos|" + ",".join(infos))
           for info in infos[:1]:
               d = json.load(open(info))
-              print("DIAG|claves|" + ",".join(d.keys()))
               el = d.get("elements", {})
-              print("DIAG|categorias|" + ",".join(el.keys()))
-              for cat in ("function", "library"):
-                  muestra = next(iter(el.get(cat, {}).values()), {})
-                  print(f"DIAG|muestra|{cat}|" + json.dumps(muestra)[:500])
-              print("DIAG|unidades|" + json.dumps(d.get("program", {}).get("outputUnits", []))[:800])
               byid = {}
               for cat, mapa in el.items():
                   for ident, e in mapa.items():
                       byid[ident] = (cat, e)
-              def biblioteca(ident):
+              faltan = collections.Counter()
+              def resolver(ident):
                   cur = ident
-                  for _ in range(30):
-                      if cur is None or cur not in byid:
-                          return "?"
+                  for _ in range(80):
+                      if cur is None:
+                          return None
+                      if cur not in byid:
+                          faltan[str(cur)[:60]] += 1
+                          return None
                       cat, e = byid[cur]
                       if cat == "library":
-                          return e.get("canonicalUri") or e.get("name") or "?"
+                          return e.get("canonicalUri") or e.get("name")
                       cur = e.get("parent")
-                  return "?"
+                  return None
               tot = collections.Counter()
+              sinlib = collections.Counter()
               for ident, (cat, e) in byid.items():
+                  if cat not in ("function", "field", "constant"):
+                      continue
                   s = e.get("size")
-                  if isinstance(s, int):
-                      tot[(str(e.get("outputUnit")), biblioteca(ident))] += s
-              for (unidad, lib), s in tot.most_common(600):
-                  if s >= 300:
-                      print(f"DIAG|lib|{unidad}|{lib}|{s}")
+                  if not isinstance(s, int):
+                      continue
+                  unidad = str(e.get("outputUnit"))
+                  lib = resolver(ident)
+                  if lib is None:
+                      sinlib[(unidad, cat)] += s
+                      lib = "?"
+                  tot[(unidad, lib)] += s
+              for (u, lib), s in tot.most_common(900):
+                  if s >= 200:
+                      print(f"DIAG|lib|{u}|{lib}|{s}")
+              for (u, c), s in sinlib.most_common(20):
+                  print(f"DIAG|sinlib|{u}|{c}|{s}")
+              for k, n in faltan.most_common(10):
+                  print(f"DIAG|faltan|{k}|{n}")
+              unidades = sorted({u for u, _ in tot})
+              print("DIAG|totales|" + ",".join(f"{u}:{sum(s for (uu, _), s in tot.items() if uu == u)}" for u in unidades))
           PY
           python3 /tmp/diag.py || true
       - uses: actions/upload-artifact@v6
