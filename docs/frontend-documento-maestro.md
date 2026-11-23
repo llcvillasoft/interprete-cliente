@@ -1,6 +1,6 @@
 # Frontend · documento maestro de arquitectura y diseño
 
-Estado al 21 de noviembre de 2026. Reemplaza a «Frontend — vistas y diseño» (borrada del proyecto el 20 de noviembre) y a «GUÍA RÁPIDA — cliente» (migrada aquí el 20 de noviembre). Su tracker es `docs/frontend-tracker.md` de este repositorio.
+Estado al 22 de noviembre de 2026. Reemplaza a «Frontend — vistas y diseño» (borrada del proyecto el 20 de noviembre) y a «GUÍA RÁPIDA — cliente» (migrada aquí el 20 de noviembre). Su tracker es `docs/frontend-tracker.md` de este repositorio.
 
 Fuentes consolidadas: el documento vivo del frontend en Claude Docs (revisión 17, con la sección «Vistas de la arquitectura modular»); el documento de arquitectura y tracker, pestaña principal (revisión 173, con las secciones «Cliente Flutter», «Interfaz de usuario», «Reportes y gráficos» y «Seguridad, privacidad y retención»); el Anexo D (AD-04, AD-05, AD-06, AD-10 y AD-15); el Anexo B; y la guía rápida del cliente (16 de noviembre), cuyas anclas, invariantes, trampas y orden se cotejaron con este documento el 20 de noviembre. Cuando dos fuentes chocan, la sección 14 lo dice.
 
@@ -78,7 +78,7 @@ Para que el usuario vuelva a ver en qué falló y por qué, hay cuatro vistas en
 | `design_system` | Tokens de color y tipografía, componentes comunes | F2 |
 | `api_client` | Cliente generado desde el OpenAPI | F2 |
 | `crypto` | Clave por usuario en el almacén seguro del sistema; cifrado de audio y de contenido personal | F2 |
-| `events_local` | Expediente local en Drift, encadenado de huellas, manifiesto | F2 |
+| `events_local` | Expediente local en Drift, encadenado de huellas, manifiesto; registro de eventos del dispositivo, que enruta cada evento a su flujo y alcance | F2 |
 | `sync` | Bandeja de salida, reintentos idempotentes, réplica de eventos del servidor | F2 |
 | `session_channel` | WebSocket de la sesión, reconexión, latido | F2 |
 | `audio_core` | Interfaz `AudioEngine` con implementaciones nativa y web | F2 |
@@ -132,6 +132,7 @@ Cada módulo de pantalla depende de interfaces, nunca de implementaciones nativa
 - El servidor hace lo que exige claves, modelos grandes o la vista de toda la historia: métricas temporales, juez, motor y supervisor, banco, voz del orador, informes y permisos.
 - Eventos que emite el dispositivo: SessionStarted, SourcePlaybackEnded, WindowClosed, CaptureRecorded (solo local), CaptureFingerprinted, VadSegmentsDetected, TranscriptProduced, DecisionRated, AdviceRated, ConsentGiven, ConsentWithdrawn y, nuevo, StimulusDisplayed.
 - Eventos que pueden emitir los dos lados: SessionPaused, SessionResumed, SessionFinished, SessionAbandoned, LanguagePairsSet, DeviceCalibrated, ReevaluationRequested, EvaluationSelected, AppealFiled, AppealResolved, AnnotationAdded, KnobLocked y KnobReleased.
+- Enrutado de los eventos del dispositivo: los de sesión van al flujo de la sesión; los consentimientos, al flujo `user:<usuario>`; CaptureRecorded, solo al flujo `<sesión>#local`, y nunca se encola. TranscriptProduced se anexa al expediente local, pero no se encola hasta acordar el formato del sellado.
 - Contenido personal (transcripción, notas y apelaciones): viaja sellado con la clave del usuario. El servidor la abre para el juez, y el dispositivo abre lo que el servidor le devuelve sellado, como ExternalRatingRecorded. El formato del sellado todavía no coincide entre cliente y servidor: el servidor sella cada campo personal en su sitio (`payload.transcript`) con un AAD de flujo, turno, tipo y campo, y el cliente sella el mapa entero bajo `payload.personal` con un AAD de flujo y evento. Queda pendiente de acordar (sección 10 del tracker).
 
 ### 4.7 Contrato con el servidor
@@ -386,6 +387,7 @@ Esta secuencia es propuesta; las fuentes no la fijan. El frontend avanza en para
 - D-11: nombre del producto. Se decide antes de publicar en tiendas.
 - D-20: cobro y tiendas. La venta empieza en web y escritorio; en iOS y Android la venta de bienes digitales pasa por la tienda.
 - Clave de datos única por usuario (decidida el 22 de noviembre): ver la sección 4.5. Bloquea la entrega de la clave en el registro hasta que D-04 esté decidido.
+- Formato del contenido sellado: pendiente. Lo decide Alejandro, porque cambia el contrato con el backend; bloquea encolar `TranscriptProduced` (tracker, sección 10).
 
 ## 16. Distribución por plataforma
 
