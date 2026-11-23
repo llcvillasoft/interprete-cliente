@@ -40,10 +40,10 @@ jobs:
         run: |
           cat > /tmp/diag.py <<'PY'
           import collections, glob, json, os
-          base = "app/build/web"
+          base = "build/web"
           for f in sorted(glob.glob(os.path.join(base, "*.js"))):
               print(f"DIAG|archivo|{os.path.basename(f)}|{os.path.getsize(f)}")
-          infos = sorted(glob.glob(os.path.join("app", "build", "**", "*.info.json"), recursive=True))
+          infos = sorted(glob.glob(os.path.join("build", "**", "*.info.json"), recursive=True))
           print("DIAG|infos|" + ",".join(infos))
           for info in infos[:1]:
               d = json.load(open(info))
