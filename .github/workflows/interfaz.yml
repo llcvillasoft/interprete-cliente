@@ -39,53 +39,28 @@ jobs:
       - name: Diagnóstico temporal de tamaño
         run: |
           cat > /tmp/diag.py <<'PY'
-          import collections, glob, json, os
+          import collections, glob, json, os, re
           base = "build/web"
           for f in sorted(glob.glob(os.path.join(base, "*.js"))):
               print(f"DIAG|archivo|{os.path.basename(f)}|{os.path.getsize(f)}")
           infos = sorted(glob.glob(os.path.join("build", "**", "*.info.json"), recursive=True))
+          def biblioteca_de(ident):
+              resto = ident.split("/", 1)[1] if "/" in ident else ident
+              lib = resto.split("::", 1)[0]
+              return re.sub(r"\.dart_tool/flutter_build/[0-9a-f]+/", "APP/", lib)
           for info in infos[:1]:
               d = json.load(open(info))
               el = d.get("elements", {})
-              byid = {}
-              for cat, mapa in el.items():
-                  for ident, e in mapa.items():
-                      byid[ident] = (cat, e)
-              faltan = collections.Counter()
-              def resolver(ident):
-                  cur = ident
-                  for _ in range(80):
-                      if cur is None:
-                          return None
-                      if cur not in byid:
-                          faltan[str(cur)[:60]] += 1
-                          return None
-                      cat, e = byid[cur]
-                      if cat == "library":
-                          return e.get("canonicalUri") or e.get("name")
-                      cur = e.get("parent")
-                  return None
               tot = collections.Counter()
-              sinlib = collections.Counter()
-              for ident, (cat, e) in byid.items():
-                  if cat not in ("function", "field", "constant"):
-                      continue
-                  s = e.get("size")
-                  if not isinstance(s, int):
-                      continue
-                  unidad = str(e.get("outputUnit"))
-                  lib = resolver(ident)
-                  if lib is None:
-                      sinlib[(unidad, cat)] += s
-                      lib = "?"
-                  tot[(unidad, lib)] += s
+              for cat in ("function", "field", "constant"):
+                  for ident, e in el.get(cat, {}).items():
+                      s = e.get("size")
+                      if not isinstance(s, int):
+                          continue
+                      tot[(str(e.get("outputUnit")), biblioteca_de(ident))] += s
               for (u, lib), s in tot.most_common(900):
                   if s >= 200:
                       print(f"DIAG|lib|{u}|{lib}|{s}")
-              for (u, c), s in sinlib.most_common(20):
-                  print(f"DIAG|sinlib|{u}|{c}|{s}")
-              for k, n in faltan.most_common(10):
-                  print(f"DIAG|faltan|{k}|{n}")
               unidades = sorted({u for u, _ in tot})
               print("DIAG|totales|" + ",".join(f"{u}:{sum(s for (uu, _), s in tot.items() if uu == u)}" for u in unidades))
           PY
