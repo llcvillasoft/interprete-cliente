@@ -23,8 +23,8 @@ Las cifras de las maquetas son ilustrativas.
 
 Son diez. Ninguna sesión de trabajo las rompe; una excepción se decide con Alejandro y se anota aquí.
 
-1. El audio del usuario nunca sale del dispositivo. Al servidor viaja la parte transportable del expediente: marcas de tiempo, tramos de voz, transcripción y huella de la grabación. Los veredictos bajan del servidor y se guardan en el expediente local.
-2. El expediente local va cifrado y encadenado por huellas. La sincronización es idempotente.
+1. El audio del usuario nunca sale del dispositivo. Al servidor viaja la parte transportable del expediente: marcas de tiempo, tramos de voz, transcripción (sellada con la clave del usuario) y huella de la grabación. Los veredictos bajan del servidor y se guardan en el expediente local.
+2. El expediente local va cifrado con la clave de datos del usuario, que es la misma que tiene el servidor, y encadenado por huellas. La sincronización es idempotente.
 3. El cliente no decide el acceso ni lleva nombres de módulos. Pinta lo que devuelve `GET /v1/catalog` y refleja `access.state`.
 4. Hay un reproductor por capacidad, elegido por `config.capability` del turno. Si el campo falta, la capacidad es consecutiva. Una capacidad que el cliente no conoce muestra el estado de actualización obligatoria.
 5. La métrica protagonista es la ventana sostenida por dirección, no la calidad Q. La nota manda solo dentro de las vistas del simulacro.
@@ -124,7 +124,7 @@ Cada módulo de pantalla depende de interfaces, nunca de implementaciones nativa
 - ASR: el POC usa faster-whisper. El documento de arquitectura propone whisper.cpp por FFI en el dispositivo, con el modelo elegido según la capacidad del equipo. La decisión es D-01 y la resuelve la prueba de sensibilidad del POC más una prueba en móvil (F2-07).
 - Ambos corren mientras suena el segmento siguiente, con prioridad baja para no interferir con el hilo de audio.
 - Sin conexión, la sesión solo puede usar ventana fija sobre ítems y paquetes ya descargados. VAD y ASR corren igual; el juez y el motor esperan a la reconexión, y el turno queda marcado como analizado más tarde.
-- Cifrado: una clave por usuario guardada en el almacén seguro del sistema (Keychain en iOS y macOS, Keystore en Android, el almacén de credenciales de Windows, el llavero en Linux). En web, la clave vive en el almacenamiento del navegador con WebCrypto.
+- Cifrado: una clave de datos por usuario, la misma en el dispositivo y en el servidor. El servidor la guarda envuelta con su clave maestra. Al registrarse, el dispositivo recibe la clave envuelta para él y la guarda en el almacén seguro del sistema (Keychain en iOS y macOS, Keystore en Android, el almacén de credenciales de Windows, el llavero en Linux). En web, la clave vive en el almacenamiento del navegador con WebCrypto. Su entrega en el registro depende de D-04 (sección 15). Borrar al usuario destruye la clave en el servidor, y el dispositivo borra la suya.
 
 ### 4.6 Reparto con el servidor
 
@@ -132,6 +132,7 @@ Cada módulo de pantalla depende de interfaces, nunca de implementaciones nativa
 - El servidor hace lo que exige claves, modelos grandes o la vista de toda la historia: métricas temporales, juez, motor y supervisor, banco, voz del orador, informes y permisos.
 - Eventos que emite el dispositivo: SessionStarted, SourcePlaybackEnded, WindowClosed, CaptureRecorded (solo local), CaptureFingerprinted, VadSegmentsDetected, TranscriptProduced, DecisionRated, AdviceRated, ConsentGiven, ConsentWithdrawn y, nuevo, StimulusDisplayed.
 - Eventos que pueden emitir los dos lados: SessionPaused, SessionResumed, SessionFinished, SessionAbandoned, LanguagePairsSet, DeviceCalibrated, ReevaluationRequested, EvaluationSelected, AppealFiled, AppealResolved, AnnotationAdded, KnobLocked y KnobReleased.
+- Contenido personal (transcripción, notas y apelaciones): viaja sellado con la clave del usuario. El servidor la abre para el juez, y el dispositivo abre lo que el servidor le devuelve sellado, como ExternalRatingRecorded. El formato del sellado todavía no coincide entre cliente y servidor: el servidor sella cada campo personal en su sitio (`payload.transcript`) con un AAD de flujo, turno, tipo y campo, y el cliente sella el mapa entero bajo `payload.personal` con un AAD de flujo y evento. Queda pendiente de acordar (sección 10 del tracker).
 
 ### 4.7 Contrato con el servidor
 
@@ -371,6 +372,7 @@ Esta secuencia es propuesta; las fuentes no la fijan. El frontend avanza en para
 - Vista de reproductor: el documento de arquitectura y la guía coinciden en que la vista de traducción a la vista usa StimulusDisplayed, pero el nombre de la tabla de eventos del dispositivo aún no está en el catálogo del servidor.
 - Formatos de maqueta: las fuentes citan los anchos 390 px y 1440 px; el ancho medio y sus puntos de corte no están definidos. La guía del cliente da 600 px y 1024 px como puntos de corte (compacto, medio y amplio). Esas cifras no aparecen en el documento vivo y quedan sin confirmar hasta que Alejandro decida.
 - Número de documentos: el Anexo D (D-23) fija un documento de arquitectura y un documento del frontend, con dos guías rápidas. El encargo del 20 de noviembre pide, además, un tracker por lado. Pendiente de confirmar.
+- Clave del usuario: el documento del frontend y el del backend describían claves separadas, una del dispositivo en el almacén seguro y otra de datos del servidor envuelta con su clave maestra. Se resuelve con una sola clave, descrita en la sección 4.5. El documento de privacidad del backend debe actualizarse en el mismo sentido.
 
 ## 15. Decisiones que tocan al cliente
 
@@ -383,6 +385,7 @@ Esta secuencia es propuesta; las fuentes no la fijan. El frontend avanza en para
 - D-07: librería de gráficos. fl_chart, tras la prueba de F4-02.
 - D-11: nombre del producto. Se decide antes de publicar en tiendas.
 - D-20: cobro y tiendas. La venta empieza en web y escritorio; en iOS y Android la venta de bienes digitales pasa por la tienda.
+- Clave de datos única por usuario (decidida el 22 de noviembre): ver la sección 4.5. Bloquea la entrega de la clave en el registro hasta que D-04 esté decidido.
 
 ## 16. Distribución por plataforma
 
