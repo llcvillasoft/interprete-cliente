@@ -204,6 +204,10 @@ jobs:
       - run: flutter pub get
       - name: Generar la plataforma Windows
         run: flutter create --platforms=windows --project-name interprete_cliente --org com.llcvillasoft .
+      - name: Integrar la biblioteca nativa de audio en la plataforma Windows
+        run: python tool/integrar_audio_core_windows.py windows/CMakeLists.txt
+      - name: Pruebas del integrador de la biblioteca nativa
+        run: python -m unittest discover -s tool -p "test_*.py"
       - name: Quitar la prueba de plantilla que genera flutter create
         shell: pwsh
         run: Remove-Item -Path test/widget_test.dart -ErrorAction SilentlyContinue
@@ -241,6 +245,8 @@ jobs:
           --dart-define=API_BASE_URL=http://127.0.0.1:8787
           --dart-define=API_DISPOSITIVO=dispositivo-prueba-001
           --dart-define=API_SECRETO=secreto-de-prueba
+      - name: Prueba de carga de audio_core.dll desde el paquete de Windows
+        run: flutter test integration_test_windows -d windows
       - name: Cancelar el run si este job falla
         if: failure()
         env:
