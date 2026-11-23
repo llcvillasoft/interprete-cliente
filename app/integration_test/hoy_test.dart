@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:interprete_cliente/config.dart';
 import 'package:interprete_cliente/datos/api_cliente.dart';
+import 'package:interprete_cliente/dominio/bandeja_salida.dart';
 import 'package:interprete_cliente/main.dart' as app;
 import 'package:interprete_cliente/recursos/textos.dart';
 
@@ -36,13 +37,14 @@ void main() {
       dispositivo: dispositivoApi,
       secreto: secretoApi,
     );
+    final bandeja = BandejaSalida(transporte: api);
     await tester.pumpWidget(
       OverflowBox(
         minWidth: ancho,
         maxWidth: ancho,
         minHeight: 844,
         maxHeight: 844,
-        child: app.AplicacionEntrenador(api: api),
+        child: app.AplicacionEntrenador(api: api, bandeja: bandeja),
       ),
     );
     await tester.pump();
