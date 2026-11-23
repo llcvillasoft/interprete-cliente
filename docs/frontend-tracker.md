@@ -21,7 +21,7 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 - F2-09 (commits 12c574d, 1aa8ed2 y 4456e05): mecanismo de la bandeja de salida y pantalla de estado del envío, fusionados en `main` (14ea812). El registro de eventos del dispositivo está en `main` (commits 329ec88 y db69e57, fusionados en abbbd7b).
 - F2-02 (commits f7b419e, ea73b9d y 7584496): puente FFI en Dart en `app/lib/datos/nucleo_audio*.dart`, con las pruebas nuevas en verde en el job `app`. La biblioteca nativa se compila en CI antes de las pruebas de Flutter. El backend WASAPI, fijado en Windows y sin probar en un equipo Windows, está en `main` desde la fusión c924089 (rama `F2-02-wasapi-windows`); la compilación cruzada con MinGW 13 queda verificada: la DLL no da avisos y exporta las 13 funciones de `audio_core.h`. La integración de CMake en la aplicación de Windows está en el commit 36d6dbb.
 - F2-08 (commit 8422114, con la implementación en ae1dd7b): expediente local en `app/lib/dominio/expediente/`, con la forma canónica y la cadena de huellas iguales a las del backend (`interp.events`). Pruebas con vectores generados por el backend y verde en el job `app`. Fusionado en `main` (56bb267).
-- F2-15 (commits 352b621 y d85defd): Ajustes en el destino Perfil, con consentimientos en solo lectura (`GET /v1/me/consents`), exportación (`POST /v1/exports`) y borrado de la cuenta con confirmación (`DELETE /v1/me`). Pruebas en verde en el job `app`. Faltan los consentimientos editables, la retención y el borrado local (sección 10).
+- F2-15 (commits 352b621 y d85defd): Ajustes en el destino Perfil, con consentimientos en solo lectura (`GET /v1/me/consents`), exportación (`POST /v1/exports`) y borrado de la cuenta con confirmación (`DELETE /v1/me`). Pruebas en verde en el job `app`. Nombre legible del consentimiento de audio y retención en pantalla (bb63847 en rojo y 5ee6fa4 en verde; D-22). Faltan los consentimientos editables y el borrado local (sección 10).
 - Siguiente paso de F2: en F2-02, medir el criterio 1 en un equipo Windows; en F2-09, el formato del sellado de la transcripción y la entrega de la clave del usuario en el registro (sección 10).
 
 ## 3. Fases del cliente
@@ -52,7 +52,7 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 | F2-12 | Sesión continua con informe | Pendiente | Hito D del POC reproducido en el cliente | El informe de sesión ya lo genera el backend (F2-17) |
 | F2-13 | Sala de revisión y panel del porqué | Pendiente | Todo error lleva a su evidencia y a su audio | Vistas 10 y 11 aprobadas en maqueta |
 | F2-14 | Apelaciones | Pendiente | Flujo de cinco pasos completo | El backend ya la sirve (F2-18); vista 12 aprobada en maqueta |
-| F2-15 | Ajustes y privacidad en el cliente | En curso | Consentimiento, retención, exportación y borrado | Vista 20 aprobada, con retoque pendiente. Ajustes en el destino Perfil: consentimientos en solo lectura (`GET /v1/me/consents`), exportación (`POST /v1/exports`) y borrado de la cuenta con confirmación (`DELETE /v1/me`); commits 352b621 (pruebas) y d85defd (implementación), con 119 pruebas en verde en el job `app`. Falta: consentimientos editables (llegan con los productores de eventos de F2-09), retención (el documento maestro no fija periodos) y el borrado local de la clave y del expediente (F2-08) |
+| F2-15 | Ajustes y privacidad en el cliente | En curso | Consentimiento, retención, exportación y borrado | Vista 20 aprobada, con retoque pendiente. Ajustes en el destino Perfil: consentimientos en solo lectura (`GET /v1/me/consents`), exportación (`POST /v1/exports`) y borrado de la cuenta con confirmación (`DELETE /v1/me`); commits 352b621 (pruebas) y d85defd (implementación), con pruebas en verde en el job `app`. Nombres legibles de los consentimientos y retención visible (bb63847 y 5ee6fa4; D-22). Falta: consentimientos editables (llegan con los productores de eventos de F2-09) y el borrado local de la clave y del expediente (F2-08) |
 | F2-16 | Matriz de dispositivos y arnés de audio | Pendiente | Resultados por dispositivo guardados | Matriz propuesta: equipo Windows del POC, un Mac, un iPhone, una tableta y dos Android de gamas distintas |
 
 ## 5. Consola y parte de cliente de F3
@@ -107,6 +107,7 @@ Las vistas 24 (tiempo real) y 25 (cabina) figuran en el catálogo de 25 aprobada
 | D-07 | Librería de gráficos | Abierta; fl_chart tras la prueba de F4-02 | F4-02 |
 | D-11 | Nombre del producto | Abierta | Publicar en tiendas |
 | D-20 | Cobro y tiendas (la venta empieza en web y escritorio) | Abierta | M5-04 |
+| D-22 | Retención: el audio guardado con consentimiento se borra 30 días después de su sesión; los eventos y el expediente duran mientras exista la cuenta, y borrar la cuenta destruye la clave | Resuelta el 22 de noviembre, por delegación de Alejandro. Provisional hasta la revisión legal y la aplicación del borrado en el backend | — |
 
 ## 9. Conflictos entre fuentes
 
@@ -123,5 +124,5 @@ Los conflictos de contenido (Hoy con o sin racha, aprobación de vistas, anchos 
 - F2-09: conectar los productores de eventos del dispositivo al registro y el cableado de la sincronización. No se conecta mientras el formato del sellado y la clave del usuario sigan pendientes.
 - Maquetar las vistas 29 a 31 (M2-08), la 32 (M5-02) y la 33 (M5-01).
 - Maquetar los retoques pendientes de la lista de la sección 7.
-- F2-15: cambiar consentimientos cuando estén los productores de eventos (F2-09); definir los periodos de retención; poner nombres legibles a los consentimientos, que hoy se muestran con la clave del contrato; retocar la vista 20.
+- F2-15: cambiar consentimientos cuando estén los productores de eventos (F2-09) y retocar la vista 20. La retención (D-22) es provisional: falta la revisión legal y que el backend aplique el borrado del audio a los 30 días. Los consentimientos sin nombre conocido siguen mostrando su clave hasta que el backend los defina.
 - Decidir D-01 antes de F2-07, D-07 antes de F4-02 y D-11 antes de publicar.
