@@ -51,8 +51,16 @@ void main() {
   testWidgets('muestra los consentimientos vigentes en solo lectura', (tester) async {
     await abrir(tester, ApiAjustesFalsa(consentidos: const {'audio': false}));
 
-    expect(find.text('audio'), findsOneWidget);
+    expect(find.text(Textos.etiquetaConsentimiento('audio')), findsOneWidget);
+    expect(find.text('audio'), findsNothing);
     expect(find.text(Textos.noConcedido), findsOneWidget);
+  });
+
+  testWidgets('explica cuánto tiempo se conserva cada dato', (tester) async {
+    await abrir(tester, ApiAjustesFalsa());
+
+    expect(find.text(Textos.retencionAudio), findsOneWidget);
+    expect(find.text(Textos.retencionEventos), findsOneWidget);
   });
 
   testWidgets('exportar pide el paquete y muestra cuántos flujos trae', (tester) async {
