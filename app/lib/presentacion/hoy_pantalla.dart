@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../datos/api_cliente.dart';
+import '../dominio/bandeja_salida.dart';
 import '../dominio/ventana.dart';
 import '../recursos/textos.dart';
 import '../tokens.dart';
+import 'estado_envio_pantalla.dart';
 import 'sesion_pantalla.dart';
 
 /// Hoy: la ventana sostenida de cada dirección y el botón para practicar.
 class HoyPantalla extends StatefulWidget {
-  const HoyPantalla({super.key, required this.api});
+  const HoyPantalla({super.key, required this.api, required this.bandeja});
 
   final ApiCliente api;
+  final BandejaSalida bandeja;
 
   @override
   State<HoyPantalla> createState() => _HoyPantallaState();
@@ -26,6 +29,12 @@ class _HoyPantallaState extends State<HoyPantalla> {
       ventanas[direccion] = ventanaDesde(direccion, niveles);
     }
     return ventanas;
+  }
+
+  void _verEstadoEnvio() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => EstadoEnvioPantalla(bandeja: widget.bandeja)),
+    );
   }
 
   Future<void> _practicar() async {
@@ -65,6 +74,15 @@ class _HoyPantallaState extends State<HoyPantalla> {
               child: FilledButton(
                 onPressed: _practicar,
                 child: Text(Textos.practicar),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Semantics(
+              identifier: 'hoy.estado.envio.boton',
+              button: true,
+              child: OutlinedButton(
+                onPressed: _verEstadoEnvio,
+                child: Text(Textos.estadoEnvio),
               ),
             ),
           ],
