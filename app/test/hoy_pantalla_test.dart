@@ -23,6 +23,20 @@ class ApiFalsa implements ApiCliente {
   @override
   Future<SesionCreada> crearSesion() async =>
       const SesionCreada(id: 'sesion-prueba-001', estado: 'created');
+
+  @override
+  Future<Map<String, bool>> consentimientos() async => const {};
+
+  @override
+  Future<ExportacionCreada> exportar() async =>
+      const ExportacionCreada(usuario: 'usuario-prueba-001', flujos: 0);
+
+  @override
+  Future<ResultadoBorrado> borrarCuenta() async => const ResultadoBorrado(
+        usuario: 'usuario-prueba-001',
+        claveDestruida: false,
+        sesiones: 0,
+      );
 }
 
 Finder conIdentificador(String identificador) => find.byWidgetPredicate(
