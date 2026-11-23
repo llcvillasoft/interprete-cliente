@@ -36,4 +36,24 @@ abstract final class Textos {
 
   static String ventanaDetalle(String direccion, String factor, String tendencia) =>
       '$direccion · f $factor · $tendencia';
+
+  static const ajustesTitulo = 'Ajustes y privacidad';
+  static const consentimientosTitulo = 'Consentimientos';
+  static const consentimientosVacios = 'No hay consentimientos registrados.';
+  static const concedido = 'Sí';
+  static const noConcedido = 'No';
+  static const datosTitulo = 'Tus datos';
+  static const exportarDatos = 'Exportar mis datos';
+  static const borrarCuenta = 'Borrar mi cuenta';
+  static const borrarCuentaPregunta = '¿Borrar tu cuenta?';
+  static const borrarCuentaAviso =
+      'Se destruye la clave de datos de tu cuenta. Lo que está sellado con ella ya no se podrá leer.';
+  static const confirmarBorrado = 'Sí, borrar';
+  static const cancelar = 'Cancelar';
+  static const errorAjustes = 'No se pudo completar la operación. Inténtalo de nuevo.';
+
+  static String exportacionLista(int flujos) => 'Exportación lista: $flujos flujos en el paquete.';
+
+  static String cuentaBorrada(int sesiones) =>
+      'Cuenta borrada. Se destruyó la clave y se borraron $sesiones sesiones.';
 }

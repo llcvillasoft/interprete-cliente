@@ -4,6 +4,7 @@ import '../datos/api_cliente.dart';
 import '../dominio/bandeja_salida.dart';
 import '../recursos/textos.dart';
 import '../tokens.dart';
+import 'ajustes_pantalla.dart';
 import 'hoy_pantalla.dart';
 
 const _destinos = <({IconData icono, String etiqueta})>[
@@ -35,9 +36,11 @@ class _RaizPantallaState extends State<RaizPantalla> {
     return LayoutBuilder(
       builder: (context, restricciones) {
         final ancho = anchoDe(restricciones.maxWidth);
-        final contenido = _indice == 0
-            ? HoyPantalla(api: widget.api, bandeja: widget.bandeja)
-            : const Center(child: Text(Textos.vistaPendiente));
+        final contenido = switch (_indice) {
+          0 => HoyPantalla(api: widget.api, bandeja: widget.bandeja),
+          4 => AjustesPantalla(api: widget.api),
+          _ => const Center(child: Text(Textos.vistaPendiente)),
+        };
 
         if (ancho == AnchoPantalla.compacto) {
           return Scaffold(
