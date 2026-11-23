@@ -21,14 +21,15 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 - F2-09 (commits 12c574d, 1aa8ed2 y 4456e05): mecanismo de la bandeja de salida y pantalla de estado del envío, fusionados en `main` (14ea812). El registro de eventos del dispositivo está en `main` (commits 329ec88 y db69e57, fusionados en abbbd7b).
 - F2-02 (commits f7b419e, ea73b9d y 7584496): puente FFI en Dart en `app/lib/datos/nucleo_audio*.dart`, con las pruebas nuevas en verde en el job `app`. La biblioteca nativa se compila en CI antes de las pruebas de Flutter. El backend WASAPI, fijado en Windows y sin probar en un equipo Windows, está en `main` desde la fusión c924089 (rama `F2-02-wasapi-windows`); la compilación cruzada con MinGW 13 queda verificada: la DLL no da avisos y exporta las 13 funciones de `audio_core.h`. La integración de CMake en la aplicación de Windows está en el commit 36d6dbb.
 - F2-08 (commit 8422114, con la implementación en ae1dd7b): expediente local en `app/lib/dominio/expediente/`, con la forma canónica y la cadena de huellas iguales a las del backend (`interp.events`). Pruebas con vectores generados por el backend y verde en el job `app`. Fusionado en `main` (56bb267).
-- F2-15 (commits 352b621 y d85defd): Ajustes en el destino Perfil, con consentimientos en solo lectura (`GET /v1/me/consents`), exportación (`POST /v1/exports`) y borrado de la cuenta con confirmación (`DELETE /v1/me`). Pruebas en verde en el job `app`. Nombre legible del consentimiento de audio y retención en pantalla (bb63847 en rojo y 5ee6fa4 en verde; D-22). Faltan los consentimientos editables y el borrado local (sección 10).
-- Siguiente paso de F2: en F2-02, medir el criterio 1 en un equipo Windows; en F2-09, el formato del sellado de la transcripción y la entrega de la clave del usuario en el registro (sección 10).
+- F2-07 (commits 42dfb35 y 149132e): puerto `MotorAsr` y sus tipos en `app/lib/dominio/asr.dart`, con validación del audio a 16 kHz, segmentos, texto completo y modelo con SHA-256; pruebas en verde en el job `app`. Elección del modelo según memoria y núcleos, con el catálogo de tiny, base y small (commits 035e60a en rojo y 0aa49b7 en verde; run 45113094230 en verde), con umbrales provisionales (D-21). Todavía no hay implementación nativa.
+- F2-15 (commits 352b621 y d85defd): Ajustes en el destino Perfil, con consentimientos en solo lectura (`GET /v1/me/consents`), exportación (`POST /v1/exports`) y borrado de la cuenta con confirmación (`DELETE /v1/me`). Nombre legible del consentimiento de audio y retención en pantalla (bb63847 y 5ee6fa4; D-22). El job `app` pasa; el job `lighthouse` falla por el ratchet de tamaño (sección 10). Faltan los consentimientos editables y el borrado local (sección 10).
+- Siguiente paso de F2: en F2-02, medir el criterio 1 en un equipo Windows; en F2-09, el formato del sellado de la transcripción y la entrega de la clave del usuario en el registro (sección 10); en F2-07, la implementación por FFI sobre whisper.cpp y la descarga del modelo.
 
 ## 3. Fases del cliente
 
 | Fase | Criterio de salida | Estado | Notas |
 | --- | --- | --- | --- |
-| F2 · Cliente MVP | Sesión adaptativa completa en el cliente, en Windows y en un móvil, con el criterio 1 del POC cumplido en ambos | En curso | Backend de F2 hecho (F2-17 a F2-23, en «Backend — tracker»); en el cliente, F2-01 hecho y F2-08 hecho (fusionado en `main`); F2-02, F2-09 y F2-15 en curso; el resto pendiente |
+| F2 · Cliente MVP | Sesión adaptativa completa en el cliente, en Windows y en un móvil, con el criterio 1 del POC cumplido en ambos | En curso | Backend de F2 hecho (F2-17 a F2-23, en «Backend — tracker»); en el cliente, F2-01 hecho y F2-08 hecho (fusionado en `main`); F2-02, F2-07, F2-09 y F2-15 en curso; el resto pendiente |
 | F3 · Multieje | Un segundo eje converge en simulación y en uso real sin degradar la pausa | En curso | Cliente pendiente: consola de perillas y mezcla de ruido en el dispositivo |
 | F4 · Progreso | Un paquete de referencia repetido muestra el progreso métrica por métrica | Pendiente en cliente | F4-02 pendiente; vistas de progreso maquetadas |
 | F5 · Tiempo real | El interlocutor vivo cumple su objetivo de latencia en uso real | Pendiente | Reproductor de tiempo real (vista 24) |
@@ -44,7 +45,7 @@ Fuentes: tracker de la pestaña principal del documento de arquitectura (revisi�
 | F2-04 | Núcleo de audio web | Pendiente | Precisión documentada y marcada como web | — |
 | F2-05 | Calibración del dispositivo | Pendiente | Veredicto apto o no apto por ruta de audio | Ver regla de calibración en el backend (F2-19) |
 | F2-06 | VAD local y prueba de equivalencia con el POC | Pendiente | Tramos dentro de la tolerancia sobre el audio dorado | Silero en ONNX Runtime, como en el POC |
-| F2-07 | ASR local según D-01 | Pendiente | Sensibilidad del juez dentro del umbral | Decisión D-01 abierta |
+| F2-07 | ASR local según D-01 | En curso | Sensibilidad del juez dentro del umbral | Decisión D-01 tomada el 22 de noviembre (sección 8). Puerto `MotorAsr` y tipos en `app/lib/dominio/asr.dart` (commits 42dfb35 y 149132e), con pruebas en verde en el job `app`. Elección del modelo según la capacidad del equipo y catálogo de tiny, base y small con sus hashes (035e60a en rojo, 0aa49b7 en verde; D-21). Los umbrales son provisionales hasta medirlos en F2-16. Falta: implementación por FFI sobre whisper.cpp, descarga y verificación del modelo, y la prueba de sensibilidad |
 | F2-08 | Expediente local cifrado con cadena de huellas | Hecho | Verificación local en verde | Canónico RFC 8785 y huella SHA-256 con vectores del backend, cadena verificada como `interp.events.chain`, expediente con contenido personal sellado en AES-256-GCM; 96 pruebas en verde en el job `app` (commit 8422114, con la implementación en ae1dd7b). Fuera de su criterio: el adaptador del almacén seguro por plataforma y la persistencia en Drift, que están en «Pendientes». Fusionado en `main` (56bb267) |
 | F2-09 | Bandeja de salida y sincronización | En curso | Una sesión sin conexión se sincroniza completa | Mecanismo listo (commit 12c574d) en `app/lib/dominio/bandeja_salida.dart`: orden, lotes de hasta 1000, reintentos con espera exponencial, rechazos definitivos aparte y sincronización única en curso. `ClienteHttp.enviarEventos` llama a `POST /v1/events:batch`. Probado con transporte simulado y con `MockClient`. Pantalla de estado del envío y entrada desde Hoy en 4456e05. Registro de eventos del dispositivo en db69e57, con pruebas en 329ec88, fusionado en `main`. Falta: los productores de eventos que llaman al registro y la sincronización, el formato del sellado de la transcripción y la clave del usuario en el registro (sección 10) |
 | F2-10 | Calibración del usuario (ρ) | Pendiente | ρ y límites de f por dirección | El backend ya fija ρ y límites con UserCalibrated (F2-19) |
@@ -98,7 +99,7 @@ Las vistas 24 (tiempo real) y 25 (cabina) figuran en el catálogo de 25 aprobada
 
 | ID | Decisión | Estado | Bloquea |
 | --- | --- | --- | --- |
-| D-01 | Dónde corre el ASR (whisper.cpp en el dispositivo, respaldo en servidor) | Abierta | F2-07 |
+| D-01 | Dónde corre el ASR (whisper.cpp en el dispositivo, respaldo en servidor) | Resuelta el 22 de noviembre: whisper.cpp en el dispositivo; respaldo en servidor solo con consentimiento | — |
 | D-02 | Respaldo del audio del usuario | Abierta; no en el MVP | Exportación completa |
 | D-03 | Segundo proveedor de voz y acentos | Abierta | F3-03 y la parte de voz del cliente |
 | D-04 | Proveedor de identidad (OIDC administrado) | Abierta | F6-03 |
@@ -107,6 +108,7 @@ Las vistas 24 (tiempo real) y 25 (cabina) figuran en el catálogo de 25 aprobada
 | D-07 | Librería de gráficos | Abierta; fl_chart tras la prueba de F4-02 | F4-02 |
 | D-11 | Nombre del producto | Abierta | Publicar en tiendas |
 | D-20 | Cobro y tiendas (la venta empieza en web y escritorio) | Abierta | M5-04 |
+| D-21 | Modelo de ASR según el equipo: tiny, base o small (medium no se ofrece en la versión 1). small desde 3 GB de memoria y 4 núcleos; base desde 1,5 GB; tiny por debajo. Los tamaños son aproximados y el hash SHA-256 es la verificación real | Resuelta el 22 de noviembre, por delegación de Alejandro. Umbrales provisionales hasta medirlos en F2-16 | — |
 | D-22 | Retención: el audio guardado con consentimiento se borra 30 días después de su sesión; los eventos y el expediente duran mientras exista la cuenta, y borrar la cuenta destruye la clave | Resuelta el 22 de noviembre, por delegación de Alejandro. Provisional hasta la revisión legal y la aplicación del borrado en el backend | — |
 
 ## 9. Conflictos entre fuentes
@@ -124,6 +126,7 @@ Los conflictos de contenido (Hoy con o sin racha, aprobación de vistas, anchos 
 - F2-09: conectar los productores de eventos del dispositivo al registro y el cableado de la sincronización. No se conecta mientras el formato del sellado y la clave del usuario sigan pendientes.
 - Maquetar las vistas 29 a 31 (M2-08), la 32 (M5-02) y la 33 (M5-01).
 - Maquetar los retoques pendientes de la lista de la sección 7.
+- F2-07: los umbrales y la lista de modelos quedaron fijados en D-21 como provisionales. Antes de cerrar la fila hay que medirlos en F2-16 y confirmar la memoria real de cada modelo en la matriz de dispositivos.
 - F2-15, ratchet de tamaño: el JavaScript de arranque mide 2258 KB (2215 KB en `main`), por encima del tope de 2209 más 25 de tolerancia de `calidad/linea-base.json`. Recortar el arranque o subir el tope es una decisión de Alejandro; la línea base solo se aprieta, así que no se ha cambiado. Los jobs de Android, iOS, Windows y batería no han corrido en este PR porque el fallo de Lighthouse cancela el run.
 - F2-15: cambiar consentimientos cuando estén los productores de eventos (F2-09) y retocar la vista 20. La retención (D-22) es provisional: falta la revisión legal y que el backend aplique el borrado del audio a los 30 días. Los consentimientos sin nombre conocido siguen mostrando su clave hasta que el backend los defina.
-- Decidir D-01 antes de F2-07, D-07 antes de F4-02 y D-11 antes de publicar.
+- Decidir D-07 antes de F4-02 y D-11 antes de publicar.
