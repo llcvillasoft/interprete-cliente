@@ -87,14 +87,25 @@ class BandejaSalida {
 
   final List<Evento> _pendientes = [];
   final List<Evento> _rechazados = [];
+  final StreamController<void> _cambios = StreamController<void>.broadcast();
   Future<ResultadoSincronizacion>? _enCurso;
+  ResultadoSincronizacion? _ultima;
 
   int get pendientes => _pendientes.length;
 
   List<Evento> get rechazados => List.unmodifiable(_rechazados);
 
+  /// El resultado de la última sincronización que terminó; `null` si todavía no ha terminado ninguna.
+  ResultadoSincronizacion? get ultimaSincronizacion => _ultima;
+
+  /// Avisa cada vez que cambian los pendientes, los rechazados o el resultado de una sincronización.
+  Stream<void> get cambios => _cambios.stream;
+
   /// Añade eventos al final de la bandeja, en el orden recibido.
-  void encolar(Iterable<Evento> eventos) => _pendientes.addAll(eventos);
+  void encolar(Iterable<Evento> eventos) {
+    _pendientes.addAll(eventos);
+    _avisar();
+  }
 
   /// Envía lo pendiente. Si ya hay una sincronización en curso, devuelve esa.
   Future<ResultadoSincronizacion> sincronizar() {
@@ -119,6 +130,7 @@ class BandejaSalida {
         nuevos += resultado.nuevos;
         duplicados += resultado.duplicados;
         intentos = 0;
+        _avisar();
       } on ErrorTransitorio {
         intentos += 1;
         if (intentos > reintentosMaximos) break;
@@ -128,14 +140,22 @@ class BandejaSalida {
         _pendientes.removeRange(0, lote.length);
         rechazados += lote.length;
         intentos = 0;
+        _avisar();
       }
     }
 
-    return ResultadoSincronizacion(
+    final resultado = ResultadoSincronizacion(
       nuevos: nuevos,
       duplicados: duplicados,
       rechazados: rechazados,
       pendientes: _pendientes.length,
     );
+    _ultima = resultado;
+    _avisar();
+    return resultado;
+  }
+
+  void _avisar() {
+    if (!_cambios.isClosed) _cambios.add(null);
   }
 }
