@@ -92,13 +92,19 @@ class _AjustesPantallaState extends State<AjustesPantalla> {
                 children: [
                   for (final entrada in consentidos.entries)
                     ListTile(
-                      title: Text(entrada.key),
+                      title: Text(Textos.etiquetaConsentimiento(entrada.key)),
                       trailing: Text(entrada.value ? Textos.concedido : Textos.noConcedido),
                     ),
                 ],
               );
             },
           ),
+          const SizedBox(height: 16),
+          Text(Textos.retencionTitulo, style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 8),
+          Text(Textos.retencionAudio),
+          const SizedBox(height: 4),
+          Text(Textos.retencionEventos),
           const SizedBox(height: 24),
           Text(Textos.datosTitulo, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),

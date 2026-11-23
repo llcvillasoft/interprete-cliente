@@ -40,8 +40,13 @@ abstract final class Textos {
   static const ajustesTitulo = 'Ajustes y privacidad';
   static const consentimientosTitulo = 'Consentimientos';
   static const consentimientosVacios = 'No hay consentimientos registrados.';
+  static const consentimientoAudio = 'Guardar mi audio en el servidor';
   static const concedido = 'Sí';
   static const noConcedido = 'No';
+  static const retencionTitulo = 'Cuánto se conserva';
+  static const retencionAudio = 'El audio guardado se borra 30 días después de cada sesión.';
+  static const retencionEventos =
+      'Los eventos y tu expediente se conservan mientras exista tu cuenta.';
   static const datosTitulo = 'Tus datos';
   static const exportarDatos = 'Exportar mis datos';
   static const borrarCuenta = 'Borrar mi cuenta';
@@ -51,6 +56,10 @@ abstract final class Textos {
   static const confirmarBorrado = 'Sí, borrar';
   static const cancelar = 'Cancelar';
   static const errorAjustes = 'No se pudo completar la operación. Inténtalo de nuevo.';
+
+  /// Nombre visible de un consentimiento; las claves sin nombre se muestran tal cual.
+  static String etiquetaConsentimiento(String clave) =>
+      clave == 'audio' ? consentimientoAudio : clave;
 
   static String exportacionLista(int flujos) => 'Exportación lista: $flujos flujos en el paquete.';
 
