@@ -8,6 +8,6 @@
     "lighthouse.accesibilidad": {"tipo": "suelo", "valor": 100, "tolerancia": 2},
     "lighthouse.buenas_practicas": {"tipo": "suelo", "valor": 79, "tolerancia": 2},
     "lighthouse.seo": {"tipo": "suelo", "valor": 90, "tolerancia": 2},
-    "rendimiento.js_kb": {"tipo": "tope", "valor": 2209, "tolerancia": 25}
+    "rendimiento.js_kb": {"tipo": "tope", "valor": 2258, "tolerancia": 25, "decision": "Subido de 2209 a 2258 KB el 23 de noviembre de 2026 por decisión de Alejandro. El arranque crece por los widgets de Material que usa la pantalla de Ajustes (F2-15); la carga diferida ya saca de él los diálogos y las listas. Se revisa con una medida real de descarga."}
   }
 }

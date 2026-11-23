@@ -27,13 +27,48 @@ class SesionCreada {
   final String estado;
 }
 
-/// Lo que la pantalla Hoy y la sesión necesitan de la API.
+/// Exportación de datos: `ExportBundle` del contrato, resumido a lo que muestra la pantalla.
+class ExportacionCreada {
+  const ExportacionCreada({required this.usuario, required this.flujos});
+
+  final String usuario;
+
+  /// Número de flujos que trae el paquete.
+  final int flujos;
+}
+
+/// Borrado de la cuenta: `DeletionResult` del contrato.
+class ResultadoBorrado {
+  const ResultadoBorrado({
+    required this.usuario,
+    required this.claveDestruida,
+    required this.sesiones,
+  });
+
+  final String usuario;
+
+  /// Si se destruyó la clave de datos del usuario en el servidor.
+  final bool claveDestruida;
+
+  final int sesiones;
+}
+
+/// Lo que la pantalla Hoy, la sesión y los ajustes necesitan de la API.
 abstract interface class ApiCliente {
   /// Factores f tras cada turno, en orden: `GET /v1/progress?metric=levels&direction=…`.
   Future<List<double>> nivelesDe(Direccion direccion);
 
   /// Crea una sesión de práctica: `POST /v1/sessions`.
   Future<SesionCreada> crearSesion();
+
+  /// Consentimientos vigentes del usuario: `GET /v1/me/consents`.
+  Future<Map<String, bool>> consentimientos();
+
+  /// Exporta los datos transportables del usuario: `POST /v1/exports`.
+  Future<ExportacionCreada> exportar();
+
+  /// Borra la cuenta y destruye su clave de datos: `DELETE /v1/me`.
+  Future<ResultadoBorrado> borrarCuenta();
 }
 
 class ClienteHttp implements ApiCliente, TransporteEventos {
@@ -96,6 +131,50 @@ class ClienteHttp implements ApiCliente, TransporteEventos {
     return SesionCreada(
       id: sesion['session_id'] as String,
       estado: sesion['status'] as String,
+    );
+  }
+
+  @override
+  Future<Map<String, bool>> consentimientos() async {
+    final token = await _tokenVigente();
+    final cuerpo = _leer(
+      await _cliente.get(
+        Uri.parse('$baseUrl/v1/me/consents'),
+        headers: {'Authorization': 'Bearer $token'},
+      ),
+    );
+    return Map<String, bool>.from(cuerpo['consents'] as Map<String, dynamic>);
+  }
+
+  @override
+  Future<ExportacionCreada> exportar() async {
+    final token = await _tokenVigente();
+    final cuerpo = _leer(
+      await _cliente.post(
+        Uri.parse('$baseUrl/v1/exports'),
+        headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+        body: jsonEncode({}),
+      ),
+    );
+    return ExportacionCreada(
+      usuario: cuerpo['user'] as String,
+      flujos: (cuerpo['streams'] as Map<String, dynamic>).length,
+    );
+  }
+
+  @override
+  Future<ResultadoBorrado> borrarCuenta() async {
+    final token = await _tokenVigente();
+    final cuerpo = _leer(
+      await _cliente.delete(
+        Uri.parse('$baseUrl/v1/me'),
+        headers: {'Authorization': 'Bearer $token'},
+      ),
+    );
+    return ResultadoBorrado(
+      usuario: cuerpo['user'] as String,
+      claveDestruida: cuerpo['key_destroyed'] as bool,
+      sesiones: cuerpo['sessions'] as int,
     );
   }
 

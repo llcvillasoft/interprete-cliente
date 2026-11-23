@@ -31,4 +31,23 @@ void main() {
     expect(Textos.cuaderno, 'Cuaderno');
     expect(Textos.perfil, 'Perfil');
   });
+
+  test('el consentimiento de audio se muestra con un nombre legible', () {
+    expect(Textos.etiquetaConsentimiento('audio'), 'Guardar mi audio en el servidor');
+  });
+
+  test('un consentimiento sin nombre conocido se muestra con su clave', () {
+    expect(Textos.etiquetaConsentimiento('marketing'), 'marketing');
+  });
+
+  test('la retención dice cuánto se conserva el audio y cuánto los eventos', () {
+    expect(
+      Textos.retencionAudio,
+      'El audio guardado se borra 30 días después de cada sesión.',
+    );
+    expect(
+      Textos.retencionEventos,
+      'Los eventos y tu expediente se conservan mientras exista tu cuenta.',
+    );
+  });
 }

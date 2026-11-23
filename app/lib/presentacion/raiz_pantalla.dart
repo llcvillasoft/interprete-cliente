@@ -4,6 +4,7 @@ import '../datos/api_cliente.dart';
 import '../dominio/bandeja_salida.dart';
 import '../recursos/textos.dart';
 import '../tokens.dart';
+import 'ajustes_pantalla.dart' deferred as ajustes;
 import 'hoy_pantalla.dart';
 
 const _destinos = <({IconData icono, String etiqueta})>[
@@ -35,9 +36,11 @@ class _RaizPantallaState extends State<RaizPantalla> {
     return LayoutBuilder(
       builder: (context, restricciones) {
         final ancho = anchoDe(restricciones.maxWidth);
-        final contenido = _indice == 0
-            ? HoyPantalla(api: widget.api, bandeja: widget.bandeja)
-            : const Center(child: Text(Textos.vistaPendiente));
+        final contenido = switch (_indice) {
+          0 => HoyPantalla(api: widget.api, bandeja: widget.bandeja),
+          4 => _Perfil(api: widget.api),
+          _ => const Center(child: Text(Textos.vistaPendiente)),
+        };
 
         if (ancho == AnchoPantalla.compacto) {
           return Scaffold(
@@ -85,6 +88,34 @@ class _RaizPantallaState extends State<RaizPantalla> {
             ],
           ),
         );
+      },
+    );
+  }
+}
+
+/// Perfil carga Ajustes al abrirse, de modo que su código no pese en el arranque de la app.
+class _Perfil extends StatefulWidget {
+  const _Perfil({required this.api});
+
+  final ApiCliente api;
+
+  @override
+  State<_Perfil> createState() => _PerfilState();
+}
+
+class _PerfilState extends State<_Perfil> {
+  late final Future<void> _carga = ajustes.loadLibrary();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<void>(
+      future: _carga,
+      builder: (context, instantanea) {
+        if (instantanea.hasError) return const Center(child: Text(Textos.errorAjustes));
+        if (instantanea.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return ajustes.AjustesPantalla(api: widget.api);
       },
     );
   }
