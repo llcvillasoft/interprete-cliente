@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../datos/api_cliente.dart';
+import '../dominio/bandeja_salida.dart';
 import '../recursos/textos.dart';
 import '../tokens.dart';
 import 'hoy_pantalla.dart';
@@ -15,9 +16,10 @@ const _destinos = <({IconData icono, String etiqueta})>[
 
 /// Estructura con la navegación adaptable al ancho: barra inferior o riel lateral.
 class RaizPantalla extends StatefulWidget {
-  const RaizPantalla({super.key, required this.api});
+  const RaizPantalla({super.key, required this.api, required this.bandeja});
 
   final ApiCliente api;
+  final BandejaSalida bandeja;
 
   @override
   State<RaizPantalla> createState() => _RaizPantallaState();
@@ -34,7 +36,7 @@ class _RaizPantallaState extends State<RaizPantalla> {
       builder: (context, restricciones) {
         final ancho = anchoDe(restricciones.maxWidth);
         final contenido = _indice == 0
-            ? HoyPantalla(api: widget.api)
+            ? HoyPantalla(api: widget.api, bandeja: widget.bandeja)
             : const Center(child: Text(Textos.vistaPendiente));
 
         if (ancho == AnchoPantalla.compacto) {
