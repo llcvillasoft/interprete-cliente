@@ -32,10 +32,52 @@ jobs:
       - run: flutter test
       - name: Compilar la web de prueba
         run: >
-          flutter build web --release
+          flutter build web --release --dump-info
           --dart-define=API_BASE_URL=http://127.0.0.1:8787
           --dart-define=API_DISPOSITIVO=dispositivo-prueba-001
           --dart-define=API_SECRETO=secreto-de-prueba
+      - name: Diagnóstico temporal de tamaño
+        run: |
+          cat > /tmp/diag.py <<'PY'
+          import collections, glob, json, os
+          base = "app/build/web"
+          for f in sorted(glob.glob(os.path.join(base, "*.js"))):
+              print(f"DIAG|archivo|{os.path.basename(f)}|{os.path.getsize(f)}")
+          infos = sorted(glob.glob(os.path.join("app", "build", "**", "*.info.json"), recursive=True))
+          print("DIAG|infos|" + ",".join(infos))
+          for info in infos[:1]:
+              d = json.load(open(info))
+              print("DIAG|claves|" + ",".join(d.keys()))
+              el = d.get("elements", {})
+              print("DIAG|categorias|" + ",".join(el.keys()))
+              for cat in ("function", "library"):
+                  muestra = next(iter(el.get(cat, {}).values()), {})
+                  print(f"DIAG|muestra|{cat}|" + json.dumps(muestra)[:500])
+              print("DIAG|unidades|" + json.dumps(d.get("program", {}).get("outputUnits", []))[:800])
+              byid = {}
+              for cat, mapa in el.items():
+                  for ident, e in mapa.items():
+                      byid[ident] = (cat, e)
+              def biblioteca(ident):
+                  cur = ident
+                  for _ in range(30):
+                      if cur is None or cur not in byid:
+                          return "?"
+                      cat, e = byid[cur]
+                      if cat == "library":
+                          return e.get("canonicalUri") or e.get("name") or "?"
+                      cur = e.get("parent")
+                  return "?"
+              tot = collections.Counter()
+              for ident, (cat, e) in byid.items():
+                  s = e.get("size")
+                  if isinstance(s, int):
+                      tot[(str(e.get("outputUnit")), biblioteca(ident))] += s
+              for (unidad, lib), s in tot.most_common(600):
+                  if s >= 300:
+                      print(f"DIAG|lib|{unidad}|{lib}|{s}")
+          PY
+          python3 /tmp/diag.py || true
       - uses: actions/upload-artifact@v6
         with:
           name: app-web
