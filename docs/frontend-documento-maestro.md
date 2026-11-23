@@ -23,7 +23,7 @@ Las cifras de las maquetas son ilustrativas.
 
 Son diez. Ninguna sesión de trabajo las rompe; una excepción se decide con Alejandro y se anota aquí.
 
-1. El audio del usuario nunca sale del dispositivo. Al servidor viaja la parte transportable del expediente: marcas de tiempo, tramos de voz, transcripción (sellada con la clave del usuario) y huella de la grabación. Los veredictos bajan del servidor y se guardan en el expediente local.
+1. El audio del usuario siempre queda en el dispositivo. Solo llega al servidor, y solo se guarda ahí, si el usuario lo consiente. Al servidor viaja la parte transportable del expediente: marcas de tiempo, tramos de voz, transcripción (sellada con la clave del usuario) y huella de la grabación. Los veredictos bajan del servidor y se guardan en el expediente local.
 2. El expediente local va cifrado con la clave de datos del usuario, que es la misma que tiene el servidor, y encadenado por huellas. La sincronización es idempotente.
 3. El cliente no decide el acceso ni lleva nombres de módulos. Pinta lo que devuelve `GET /v1/catalog` y refleja `access.state`.
 4. Hay un reproductor por capacidad, elegido por `config.capability` del turno. Si el campo falta, la capacidad es consecutiva. Una capacidad que el cliente no conoce muestra el estado de actualización obligatoria.
@@ -121,10 +121,10 @@ Cada módulo de pantalla depende de interfaces, nunca de implementaciones nativa
 ### 4.5 Análisis local, sin conexión y cifrado
 
 - VAD: Silero en ONNX Runtime, como en el POC. Corre sobre la grabación guardada, tras cerrar la captura. La implementación en el cliente se confirma en F2-06.
-- ASR: el POC usa faster-whisper. El documento de arquitectura propone whisper.cpp por FFI en el dispositivo, con el modelo elegido según la capacidad del equipo. La decisión es D-01 y la resuelve la prueba de sensibilidad del POC más una prueba en móvil (F2-07).
+- ASR: el POC usa faster-whisper. El producto usa whisper.cpp por FFI en el dispositivo, con el modelo elegido según la capacidad del equipo (D-01, tomada el 22 de noviembre). Las pruebas de F2-07 eligen el modelo; el respaldo en servidor solo con consentimiento.
 - Ambos corren mientras suena el segmento siguiente, con prioridad baja para no interferir con el hilo de audio.
 - Sin conexión, la sesión solo puede usar ventana fija sobre ítems y paquetes ya descargados. VAD y ASR corren igual; el juez y el motor esperan a la reconexión, y el turno queda marcado como analizado más tarde.
-- Cifrado: una clave de datos por usuario, la misma en el dispositivo y en el servidor. El servidor la guarda envuelta con su clave maestra. Al registrarse, el dispositivo recibe la clave envuelta para él y la guarda en el almacén seguro del sistema (Keychain en iOS y macOS, Keystore en Android, el almacén de credenciales de Windows, el llavero en Linux). En web, la clave vive en el almacenamiento del navegador con WebCrypto. Su entrega en el registro depende de D-04 (sección 15). Borrar al usuario destruye la clave en el servidor, y el dispositivo borra la suya.
+- Cifrado: una clave de datos por usuario, la misma en el dispositivo y en el servidor. El servidor la guarda envuelta con su clave maestra. Al registrarse, el dispositivo recibe la clave envuelta para él y la guarda en el almacén seguro del sistema (Keychain en iOS y macOS, Keystore en Android, el almacén de credenciales de Windows, el llavero en Linux). En web, la clave vive en el almacenamiento del navegador con WebCrypto. El audio que el usuario consienta guardar en el servidor se cifra con esa misma clave. Su entrega en el registro depende de D-04 (sección 15). Borrar al usuario destruye la clave en el servidor, y el dispositivo borra la suya.
 
 ### 4.6 Reparto con el servidor
 
@@ -360,7 +360,7 @@ Esta secuencia es propuesta; las fuentes no la fijan. El frontend avanza en para
 - Maquetar: calentamiento; informe de paquete; informe de calibración; subpantallas del laboratorio (golden set y simulación contrafactual); vistas 29 a 33; retoques de la sección 10.1.
 - Tema claro: el módulo `app_shell` lo prevé y las maquetas solo cubren el oscuro.
 - Nombre del producto (D-11): la primera ejecución lleva un marcador.
-- Librería de gráficos (D-07): fl_chart para los gráficos y CustomPainter para las ondas, a confirmar con una prueba en F4 (F4-02).
+- Librería de gráficos (D-07): fl_chart para los gráficos y CustomPainter para las ondas. D-07 está tomada el 22 de noviembre; la prueba de F4 (F4-02) sigue como verificación.
 - Actualizar la fila de Hoy en la tabla de pantallas del documento de arquitectura, o retirar esa tabla y remitir a este documento.
 
 ## 14. Conflictos entre fuentes
@@ -369,23 +369,24 @@ Esta secuencia es propuesta; las fuentes no la fijan. El frontend avanza en para
 - Aprobación de las vistas: la guía del cliente y el documento del frontend dicen que las 25 vistas originales están aprobadas el 13 de noviembre. Las siete de ancho amplio, los tres estados de espera y las vistas 26 a 28 se aprobaron el 20 de noviembre.
 - Copia del proyecto: «Frontend — vistas y diseño» (14 de noviembre) no trae la sección «Vistas de la arquitectura modular». Esta versión sí la trae, tomada del documento vivo.
 - Anexo A: la copia «Anexo A — Vistas del cliente» se eliminó del proyecto en una sesión anterior, sin haberse cotejado línea a línea con este documento. Su pestaña sigue viva en el documento de arquitectura (cuerpo 5babcbef-203e). Si falta algo, se consulta la pestaña.
-- ASR: el POC usa faster-whisper; el documento de arquitectura propone whisper.cpp para el cliente. Decide D-01.
+- ASR: el POC usa faster-whisper; el cliente usa whisper.cpp (D-01, tomada el 22 de noviembre).
 - Vista de reproductor: el documento de arquitectura y la guía coinciden en que la vista de traducción a la vista usa StimulusDisplayed, pero el nombre de la tabla de eventos del dispositivo aún no está en el catálogo del servidor.
 - Formatos de maqueta: las fuentes citan los anchos 390 px y 1440 px; el ancho medio y sus puntos de corte no están definidos. La guía del cliente da 600 px y 1024 px como puntos de corte (compacto, medio y amplio). Esas cifras no aparecen en el documento vivo y quedan sin confirmar hasta que Alejandro decida.
-- Número de documentos: el Anexo D (D-23) fija un documento de arquitectura y un documento del frontend, con dos guías rápidas. El encargo del 20 de noviembre pide, además, un tracker por lado. Pendiente de confirmar.
-- Clave del usuario: el documento del frontend y el del backend describían claves separadas, una del dispositivo en el almacén seguro y otra de datos del servidor envuelta con su clave maestra. Se resuelve con una sola clave, descrita en la sección 4.5. El documento de privacidad del backend debe actualizarse en el mismo sentido.
+- Número de documentos: resuelto el 22 de noviembre (D-23). Son cuatro: el maestro y el tracker de cada lado; las guías se migraron. El Anexo D proponía dos documentos y dos guías.
+- Clave del usuario: el documento del frontend y el del backend describían claves separadas, una del dispositivo en el almacén seguro y otra de datos del servidor envuelta con su clave maestra. Se resuelve con una sola clave, descrita en la sección 4.5.
 
 ## 15. Decisiones que tocan al cliente
 
-- D-01: dónde corre el ASR. Afecta a `local_analysis`, al tamaño del modelo que se descarga y a F2-07.
-- D-02: respaldo del audio del usuario. No en el MVP; más adelante, opcional y cifrado de extremo a extremo.
-- D-03: segundo proveedor de voz y acentos regionales. Se elige con la prueba de audición de F3-03.
-- D-04: proveedor de identidad. Un servicio OIDC administrado, antes de abrir a un segundo usuario (F6-03).
-- D-05: hosting de producción. Por decidir.
+- D-01 (tomada el 22 de noviembre): el ASR corre en el dispositivo con whisper.cpp; el respaldo en servidor solo con consentimiento. Afecta a `local_analysis`, al tamaño del modelo que se descarga y a F2-07.
+- D-02 (tomada el 22 de noviembre): el audio se guarda en el servidor desde la primera versión, solo con consentimiento del usuario y cifrado con su clave (no de extremo a extremo). Afecta a la vista 20 (ajustes y privacidad), que muestra los consentimientos.
+- D-03 (tomada el 22 de noviembre): un solo proveedor de voz; no se añade un segundo.
+- D-04 (pospuesta a F6): proveedor de identidad. Un servicio OIDC administrado, antes de abrir a un segundo usuario (F6-03).
+- D-05 (abierta): hosting de producción. Se decide al comparar costo y región.
 - D-06: resuelta el 15 de noviembre: módulos con permisos por tiempo.
-- D-07: librería de gráficos. fl_chart, tras la prueba de F4-02.
-- D-11: nombre del producto. Se decide antes de publicar en tiendas.
-- D-20: cobro y tiendas. La venta empieza en web y escritorio; en iOS y Android la venta de bienes digitales pasa por la tienda.
+- D-07 (tomada el 22 de noviembre): librería de gráficos, fl_chart.
+- D-11 (tomada el 22 de noviembre): el nombre es Interprete, como ahora.
+- D-20 (abierta): cobro y tiendas. La venta empieza en web y escritorio; en iOS y Android la venta de bienes digitales pasa por la tienda. Se decide en M5-04.
+- Anotaciones (AnnotationAdded): se sellan con la clave del usuario, decisión del 22 de noviembre; el cliente las sella antes de enviarlas.
 - Clave de datos única por usuario (decidida el 22 de noviembre): ver la sección 4.5. Bloquea la entrega de la clave en el registro hasta que D-04 esté decidido.
 - Formato del contenido sellado: pendiente. Lo decide Alejandro, porque cambia el contrato con el backend; bloquea encolar `TranscriptProduced` (tracker, sección 10).
 
@@ -410,7 +411,7 @@ Esta secuencia es propuesta; las fuentes no la fijan. El frontend avanza en para
 - El paquete de referencia no es lo que se compra. Usar siempre «módulo» para lo vendible.
 - El índice de preparación no se dibuja como probabilidad. Sin calibración publicada dice «sin calibrar».
 - El cliente web no ofrece la misma precisión de medición que el nativo; cada turno lo registra.
-- Decisiones abiertas que tocan al cliente: D-01, D-07, D-11 y D-20 (sección 15).
+- Decisiones abiertas que tocan al cliente: D-04, D-05 y D-20 (sección 15).
 - Maquetas que faltan desde antes: calentamiento, informe de paquete, informe de calibración, subpantallas del laboratorio, ancho medio y tema claro (sección 13).
 
 ## 18. Procedencia
