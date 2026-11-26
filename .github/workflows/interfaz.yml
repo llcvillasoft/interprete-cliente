@@ -183,8 +183,18 @@ jobs:
           script: |
             adb -s emulator-5554 wait-for-device
             adb -s emulator-5554 install --no-streaming -r app/build/app/outputs/flutter-apk/app-debug.apk
-            # Con límite de 25 minutos: un atasco de Flutter falla aquí, no a las seis horas.
-            cd app && timeout 1500 flutter test integration_test -d emulator-5554 --dart-define=API_BASE_URL=http://10.0.2.2:8787 --dart-define=API_DISPOSITIVO=dispositivo-prueba-001 --dart-define=API_SECRETO=secreto-de-prueba
+            # Al terminar, con éxito o fallo, guarda el logcat y los procesos del emulador.
+            trap 'adb -s emulator-5554 logcat -d > logcat-android.txt 2>&1 || true; adb -s emulator-5554 shell ps -A > procesos-android.txt 2>&1 || true' EXIT
+            # Con límite de 25 minutos: un atasco de Flutter falla aquí, no a las seis horas. -v muestra el progreso.
+            cd app && timeout 1500 flutter test -v integration_test -d emulator-5554 --dart-define=API_BASE_URL=http://10.0.2.2:8787 --dart-define=API_DISPOSITIVO=dispositivo-prueba-001 --dart-define=API_SECRETO=secreto-de-prueba
+      - uses: actions/upload-artifact@v6
+        if: failure()
+        with:
+          name: android-diagnostico
+          path: |
+            logcat-android.txt
+            procesos-android.txt
+          if-no-files-found: ignore
       - name: Cancelar el run si este job falla
         if: failure()
         env:
