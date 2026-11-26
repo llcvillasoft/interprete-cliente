@@ -106,9 +106,9 @@ class WhisperEnIsolate implements BackendWhisper {
   static void _entrada((SendPort, String, String, int) arranque) {
     final (puertoPrincipal, biblioteca, modelo, hilos) = arranque;
     final puertoPeticiones = ReceivePort();
-    WhisperNativo? backend;
+    final WhisperNativo cargado;
     try {
-      backend = WhisperNativo.abrir(
+      cargado = WhisperNativo.abrir(
         rutaBiblioteca: biblioteca,
         rutaModelo: modelo,
         hilos: hilos,
@@ -118,7 +118,6 @@ class WhisperEnIsolate implements BackendWhisper {
       puertoPeticiones.close();
       return;
     }
-    final cargado = backend;
     puertoPrincipal.send(puertoPeticiones.sendPort);
     puertoPeticiones.listen((Object? mensaje) async {
       if (mensaje == null) {
