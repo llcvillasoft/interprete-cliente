@@ -28,6 +28,12 @@ jobs:
           cmake --build native/audio_core/build --parallel
           ctest --test-dir native/audio_core/build --output-on-failure
           echo "AUDIO_CORE_LIB=$PWD/native/audio_core/build/libaudio_core.so" >> "$GITHUB_ENV"
+      - name: Compilar la envoltura de whisper.cpp y sus pruebas en C
+        run: |
+          cmake -S native/whisper_core -B native/whisper_core/build -DCMAKE_BUILD_TYPE=Release
+          cmake --build native/whisper_core/build --parallel
+          ctest --test-dir native/whisper_core/build --output-on-failure
+          echo "WHISPER_CORE_LIB=$PWD/native/whisper_core/build/libwhisper_core.so" >> "$GITHUB_ENV"
       - run: flutter analyze --no-fatal-infos
       - run: flutter test
       - name: Compilar la web de prueba
