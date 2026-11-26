@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:interprete_cliente/datos/asr_isolate.dart';
+import 'package:interprete_cliente/dominio/asr.dart';
 
 final String? _biblioteca = Platform.environment['WHISPER_CORE_LIB'];
 final String? _modelo = Platform.environment['WHISPER_MODELO_PRUEBA'];
