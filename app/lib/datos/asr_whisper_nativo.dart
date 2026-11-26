@@ -39,8 +39,7 @@ typedef _ResultFree = void Function(Pointer<_WcResult>);
 /// hay que moverla a un isolate, porque un modelo grande puede tardar varios segundos.
 class WhisperNativo implements BackendWhisper {
   WhisperNativo._(this._biblioteca, this._modelo)
-      : _cargar = _biblioteca.lookupFunction<_LoadC, _Load>('wc_load'),
-        _liberar = _biblioteca.lookupFunction<_FreeC, _Free>('wc_free'),
+      : _liberar = _biblioteca.lookupFunction<_FreeC, _Free>('wc_free'),
         _transcribir = _biblioteca.lookupFunction<_TranscribeC, _Transcribe>('wc_transcribe'),
         _contar = _biblioteca.lookupFunction<_CountC, _Count>('wc_result_count'),
         _t0 = _biblioteca.lookupFunction<_TimeC, _Time>('wc_result_t0_cs'),
@@ -73,7 +72,6 @@ class WhisperNativo implements BackendWhisper {
 
   final DynamicLibrary _biblioteca;
   final Pointer<_WcModel> _modelo;
-  final _Load _cargar;
   final _Free _liberar;
   final _Transcribe _transcribir;
   final _Count _contar;
