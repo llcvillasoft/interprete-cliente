@@ -42,11 +42,14 @@ typedef struct {
 uint32_t am_detect_onsets(const float *x, uint32_t n, float threshold,
                           uint32_t refractory, uint32_t *out, uint32_t max_out);
 
-/* Compara `n` instantes emitidos con los `n` detectados, en el mismo orden. La
- * latencia de ida y vuelta de cada par es detectado - emitido; el informe da la
- * mediana de esa latencia y el error de cada par frente a ella. */
-am_status am_latency_report(const uint64_t *emitted, const uint64_t *detected,
-                            uint32_t n, uint32_t sample_rate, am_report *out);
+/* Compara los instantes emitidos con los detectados, en el mismo orden. Ambas
+ * listas deben tener la misma longitud: si no, devuelve AM_ERR_COUNT (un clic
+ * perdido o uno de más). La latencia de ida y vuelta de cada par es
+ * detectado - emitido; el informe da la mediana de esa latencia y el error de
+ * cada par frente a ella. */
+am_status am_latency_report(const uint64_t *emitted, uint32_t n_emitted,
+                            const uint64_t *detected, uint32_t n_detected,
+                            uint32_t sample_rate, am_report *out);
 
 #ifdef __cplusplus
 }

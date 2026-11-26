@@ -94,7 +94,7 @@ static void test_constant_latency_has_zero_error(void) {
   am_report r;
   memset(&r, 0, sizeof r);
 
-  CHECK(am_latency_report(emitted, detected, 3, SR, &r) == AM_OK);
+  CHECK(am_latency_report(emitted, 3, detected, 3, SR, &r) == AM_OK);
   CHECK(r.pairs == 3);
   CHECK_NEAR(r.latency_ms, 2000.0 * 1000.0 / SR, 1e-9);
   CHECK_NEAR(r.max_error_ms, 0.0, 1e-9);
@@ -110,7 +110,7 @@ static void test_jitter_below_threshold_passes(void) {
   am_report r;
   memset(&r, 0, sizeof r);
 
-  CHECK(am_latency_report(emitted, detected, 3, SR, &r) == AM_OK);
+  CHECK(am_latency_report(emitted, 3, detected, 3, SR, &r) == AM_OK);
   CHECK_NEAR(r.max_error_ms, 1000.0 * 1000.0 / SR, 1e-9);
   CHECK(r.pass == 1);
 }
@@ -122,7 +122,7 @@ static void test_error_above_threshold_fails(void) {
   am_report r;
   memset(&r, 0, sizeof r);
 
-  CHECK(am_latency_report(emitted, detected, 3, SR, &r) == AM_OK);
+  CHECK(am_latency_report(emitted, 3, detected, 3, SR, &r) == AM_OK);
   CHECK(r.max_error_ms > AM_UMBRAL_ERROR_MS);
   CHECK(r.pass == 0);
 }
@@ -134,7 +134,7 @@ static void test_error_exactly_at_threshold_passes(void) {
   am_report r;
   memset(&r, 0, sizeof r);
 
-  CHECK(am_latency_report(emitted, detected, 4, SR, &r) == AM_OK);
+  CHECK(am_latency_report(emitted, 4, detected, 4, SR, &r) == AM_OK);
   CHECK_NEAR(r.max_error_ms, AM_UMBRAL_ERROR_MS, 1e-9);
   CHECK(r.pass == 1);
 }
@@ -146,7 +146,7 @@ static void test_median_of_even_count_is_mean_of_middle_pair(void) {
   am_report r;
   memset(&r, 0, sizeof r);
 
-  CHECK(am_latency_report(emitted, detected, 4, SR, &r) == AM_OK);
+  CHECK(am_latency_report(emitted, 4, detected, 4, SR, &r) == AM_OK);
   CHECK_NEAR(r.latency_ms, 250.0 * 1000.0 / SR, 1e-9);
 }
 
@@ -154,18 +154,18 @@ static void test_count_mismatch_is_reported(void) {
   uint64_t emitted[3] = {0, 24000, 48000};
   uint64_t detected[2] = {2000, 26000};
   am_report r;
-  CHECK(am_latency_report(emitted, detected, 3, SR, &r) == AM_ERR_COUNT);
+  CHECK(am_latency_report(emitted, 3, detected, 2, SR, &r) == AM_ERR_COUNT);
 }
 
 static void test_report_rejects_bad_arguments(void) {
   uint64_t emitted[1] = {0};
   uint64_t detected[1] = {0};
   am_report r;
-  CHECK(am_latency_report(NULL, detected, 1, SR, &r) == AM_ERR_ARG);
-  CHECK(am_latency_report(emitted, NULL, 1, SR, &r) == AM_ERR_ARG);
-  CHECK(am_latency_report(emitted, detected, 1, SR, NULL) == AM_ERR_ARG);
-  CHECK(am_latency_report(emitted, detected, 0, SR, &r) == AM_ERR_ARG);
-  CHECK(am_latency_report(emitted, detected, 1, 0, &r) == AM_ERR_ARG);
+  CHECK(am_latency_report(NULL, 1, detected, 1, SR, &r) == AM_ERR_ARG);
+  CHECK(am_latency_report(emitted, 1, NULL, 1, SR, &r) == AM_ERR_ARG);
+  CHECK(am_latency_report(emitted, 1, detected, 1, SR, NULL) == AM_ERR_ARG);
+  CHECK(am_latency_report(emitted, 0, detected, 0, SR, &r) == AM_ERR_ARG);
+  CHECK(am_latency_report(emitted, 1, detected, 1, 0, &r) == AM_ERR_ARG);
 }
 
 int main(void) {
