@@ -51,6 +51,21 @@ class ResultadoAsr {
       .join(' ');
 }
 
+/// Registro de segmento tal como lo devuelve whisper.cpp: tiempos en centésimas de segundo.
+typedef RegistroWhisper = ({int t0, int t1, String texto});
+
+/// Convierte los registros de whisper.cpp en segmentos del dominio, en el mismo orden.
+List<SegmentoAsr> segmentosDesdeWhisper(List<RegistroWhisper> registros) {
+  return [
+    for (final registro in registros)
+      SegmentoAsr.nuevo(
+        inicio: Duration(milliseconds: registro.t0 * 10),
+        fin: Duration(milliseconds: registro.t1 * 10),
+        texto: registro.texto.trim(),
+      ),
+  ];
+}
+
 /// Modelo de reconocimiento que se descarga y se verifica por su hash.
 ///
 /// El tamaño es aproximado y sirve para mostrar la descarga; la verificación real es el hash.

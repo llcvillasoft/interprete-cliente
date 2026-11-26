@@ -55,6 +55,35 @@ void main() {
     });
   });
 
+  group('conversión de segmentos de whisper.cpp', () {
+    test('convierte centésimas de segundo en duraciones y recorta el texto', () {
+      final segmentos = segmentosDesdeWhisper([(t0: 0, t1: 250, texto: ' hola ')]);
+      expect(segmentos, hasLength(1));
+      expect(segmentos.single.inicio, Duration.zero);
+      expect(segmentos.single.fin, const Duration(milliseconds: 2500));
+      expect(segmentos.single.texto, 'hola');
+    });
+
+    test('mantiene el orden de los registros', () {
+      final segmentos = segmentosDesdeWhisper([
+        (t0: 0, t1: 100, texto: 'uno'),
+        (t0: 100, t1: 200, texto: 'dos'),
+      ]);
+      expect(segmentos.map((s) => s.texto), ['uno', 'dos']);
+    });
+
+    test('una lista vacía da una lista vacía', () {
+      expect(segmentosDesdeWhisper(const []), isEmpty);
+    });
+
+    test('rechaza un registro cuyo fin es anterior al inicio', () {
+      expect(
+        () => segmentosDesdeWhisper([(t0: 200, t1: 100, texto: 'mal')]),
+        throwsArgumentError,
+      );
+    });
+  });
+
   group('modelo de reconocimiento', () {
     test('el hash del modelo debe ser SHA-256 en hexadecimal minúsculo', () {
       expect(
