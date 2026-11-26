@@ -1,6 +1,6 @@
 # GUÍA RÁPIDA · CLIENTE
 
-Para la sesión que programa o diseña el cliente Flutter (interfaz visual, audio en el dispositivo, expediente local). Leer esto primero y nada más; ir a los documentos solo por el ancla indicada. Estado: 16 de noviembre de 2026; el backend modular de M1 está en master 2f51ee0. La guía del servidor es otro archivo: «claude/GUÍA RÁPIDA — backend.md».
+Para la sesión que programa o diseña el cliente Flutter (interfaz visual, audio en el dispositivo, expediente local). Leer esto primero y nada más; ir a los documentos solo por el ancla indicada. Estado: 16 de noviembre de 2026; el backend modular de M1 está en el commit 2f51ee0. La guía del servidor es otro archivo: «claude/GUÍA RÁPIDA — backend.md».
 
 ## 0. Anclas
 
