@@ -33,3 +33,10 @@ add_test(NAME audio_core COMMAND test_audio_core)
 add_executable(test_medicion test/test_medicion.c src/medicion.c)
 target_include_directories(test_medicion PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
 add_test(NAME audio_medicion COMMAND test_medicion)
+
+# Arnés de medición del criterio 1 con la interfaz de audio. Necesita el bucle de
+# retorno; no es una prueba de CI.
+add_executable(medir_criterio1 herramientas/medir_criterio1.c src/medicion.c)
+target_include_directories(medir_criterio1 PRIVATE
+  "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_link_libraries(medir_criterio1 PRIVATE audio_core)
