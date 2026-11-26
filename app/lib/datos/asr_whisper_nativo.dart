@@ -38,15 +38,15 @@ typedef _ResultFree = void Function(Pointer<_WcResult>);
 /// La transcripción corre en el hilo que la llama. Antes de usarla en la interfaz
 /// hay que moverla a un isolate, porque un modelo grande puede tardar varios segundos.
 class WhisperNativo implements BackendWhisper {
-  WhisperNativo._(this._biblioteca, this._modelo)
-      : _liberar = _biblioteca.lookupFunction<_FreeC, _Free>('wc_free'),
-        _transcribir = _biblioteca.lookupFunction<_TranscribeC, _Transcribe>('wc_transcribe'),
-        _contar = _biblioteca.lookupFunction<_CountC, _Count>('wc_result_count'),
-        _t0 = _biblioteca.lookupFunction<_TimeC, _Time>('wc_result_t0_cs'),
-        _t1 = _biblioteca.lookupFunction<_TimeC, _Time>('wc_result_t1_cs'),
-        _texto = _biblioteca.lookupFunction<_TextC, _Text>('wc_result_text'),
+  WhisperNativo._(DynamicLibrary biblioteca, this._modelo)
+      : _liberar = biblioteca.lookupFunction<_FreeC, _Free>('wc_free'),
+        _transcribir = biblioteca.lookupFunction<_TranscribeC, _Transcribe>('wc_transcribe'),
+        _contar = biblioteca.lookupFunction<_CountC, _Count>('wc_result_count'),
+        _t0 = biblioteca.lookupFunction<_TimeC, _Time>('wc_result_t0_cs'),
+        _t1 = biblioteca.lookupFunction<_TimeC, _Time>('wc_result_t1_cs'),
+        _texto = biblioteca.lookupFunction<_TextC, _Text>('wc_result_text'),
         _liberarResultado =
-            _biblioteca.lookupFunction<_ResultFreeC, _ResultFree>('wc_result_free');
+            biblioteca.lookupFunction<_ResultFreeC, _ResultFree>('wc_result_free');
 
   /// Abre `libwhisper_core` y carga el modelo. Lanza [StateError] si el modelo no abre.
   static WhisperNativo abrir({
@@ -70,7 +70,6 @@ class WhisperNativo implements BackendWhisper {
     }
   }
 
-  final DynamicLibrary _biblioteca;
   final Pointer<_WcModel> _modelo;
   final _Free _liberar;
   final _Transcribe _transcribir;
