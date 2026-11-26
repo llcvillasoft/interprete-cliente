@@ -28,3 +28,8 @@ enable_testing()
 add_executable(test_audio_core test/test_audio_core.c)
 target_link_libraries(test_audio_core PRIVATE audio_core)
 add_test(NAME audio_core COMMAND test_audio_core)
+
+# Medición del criterio 1 (F2-02): funciones puras, sin audio, fuera de la DLL.
+add_executable(test_medicion test/test_medicion.c src/medicion.c)
+target_include_directories(test_medicion PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+add_test(NAME audio_medicion COMMAND test_medicion)
